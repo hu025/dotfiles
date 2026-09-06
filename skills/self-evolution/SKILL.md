@@ -15,16 +15,16 @@ description: 自我进化操作手册。触发词：「强化」「进化」「�
 
 ```bash
 # 主要成就
-python3 ~/dotfiles/self-improvement/agent_core.py success "<做了什么>" "<详细说明>"
+python3 ~/.hermes/self-improvement/agent_core.py success "<做了什么>" "<详细说明>"
 
 # 失败（如有）
-python3 ~/dotfiles/self-improvement/agent_core.py failure "<失败的事>" "<错误信息>"
+python3 ~/.hermes/self-improvement/agent_core.py failure "<失败的事>" "<错误信息>"
 
 # 学到新东西
-python3 ~/dotfiles/self-improvement/agent_core.py learning "<学到什么>" "<来源>" "<效果>"
+python3 ~/.hermes/self-improvement/agent_core.py learning "<学到什么>" "<来源>" "<效果>"
 
 # 改进了什么
-python3 ~/dotfiles/self-improvement/agent_core.py improve "<领域>" "<改进内容>" "<结果>"
+python3 ~/.hermes/self-improvement/agent_core.py improve "<领域>" "<改进内容>" "<结果>"
 
 # 同步到 hermes
 ~/dotfiles/bin/sync-skills
