@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.log
+.env
+*.tmp
+.DS_Store
+
+# Embedded git repos (don't track their .git folders)
+skills/*/.git
+skills/*/*/.git
+skills/*/*/*/.git
