@@ -229,6 +229,12 @@ novels/小说/高武重生/
 
 **创作即检测。** 每章完成后必须通过本技法全部检查项，才能进入文档同步。
 
+> **去AI化完整方案**：本技法是快速检查参考。完整的AI检测理论、词汇表、去AI化技术、Humanizer工作流，详见 `novel-writing-ai-free` 技能（`~/dotfiles/skills/novel-writing-ai-free/SKILL.md`），包含：
+> - AI三大统计信号（Perplexity/Burstiness/结构模板）
+> - 各模型家族特征词指纹（GPT-4/Claude/Gemini/Llama/Mistral）
+> - 本地检测工具（lmscan/uncanny/fast-ai-detector）
+> - Humanizer工具与组合工作流
+
 ---
 
 ### 一、词汇过滤（必过三关）
