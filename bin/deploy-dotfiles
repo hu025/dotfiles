@@ -1,0 +1,49 @@
+#!/bin/bash
+# deploy-dotfiles — 监听 dotfiles 变化，自动同步到 hermes 并记录改进
+# 用法: ./bin/deploy-dotfiles  (daemon mode)
+#        ./bin/deploy-dotfiles push  (commit + 可选 push)
+
+HERMES_DIR="$HOME/.hermes"
+DOTFILES_DIR="$HOME/dotfiles"
+LOG="$HOME/.hermes/self-improvement/logs/dotfiles_sync.log"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG"
+}
+
+do_sync() {
+    # 同步 skills
+    $DOTFILES_DIR/bin/sync-skills >> "$LOG" 2>&1
+    # 同步 bin scripts
+    mkdir -p "$HERMES_DIR/bin"
+    cp -r "$DOTFILES_DIR/bin/"*.sh "$HERMES_DIR/bin/" 2>/dev/null
+    cp -r "$DOTFILES_DIR/bin/"*.py "$HERMES_DIR/bin/" 2>/dev/null
+    log "dotfiles deployed"
+}
+
+if [ "$1" = "push" ]; then
+    # 检测变化并提交
+    cd "$DOTFILES_DIR" || exit 1
+    if [ -n "$(git status --porcelain)" ]; then
+        git add -A
+        # 生成描述性 commit message
+        changed=$(git diff --cached --stat | tail -1)
+        git commit -m "auto: $changed" >> "$LOG" 2>&1
+        log "committed: $changed"
+        if [ -n "$2" ]; then
+            git push "$2" main >> "$LOG" 2>&1 && log "pushed to $2"
+        fi
+    else
+        log "no changes to commit"
+    fi
+elif [ "$1" = "sync" ]; then
+    do_sync
+else
+    # daemon mode: 监听变化
+    echo "dotfiles deploy daemon running (PID: $$)"
+    echo "Use Ctrl+C to stop"
+    while true; do
+        inotifywait -r -e modify,create,delete "$DOTFILES_DIR/skills" "$DOTFILES_DIR/bin" 2>/dev/null
+        do_sync
+    done
+fi

@@ -1,0 +1,39 @@
+#!/bin/bash
+# sync-skills — 从 dotfiles 同步 skills 到 ~/.hermes/skills/
+# 用法: ./bin/sync-skills [category]
+# 不带参数 = 同步所有
+
+HERMES_DIR="${HERMES_DIR:-$HOME/.hermes/skills}"
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+
+SYNC_COUNT=0
+
+if [ -z "$1" ]; then
+    # 同步所有分类
+    for cat in ~/dotfiles/skills/*/; do
+        name=$(basename "$cat")
+        src="$DOTFILES_DIR/skills/$name"
+        dst="$HERMES_DIR/$name"
+        if [ -d "$src" ]; then
+            # 检查是否有更新
+            if [ ! -d "$dst" ] || [ "$(find "$src" -name '*.md' -newer "$dst" 2>/dev/null | head -1)" ]; then
+                cp -r "$src" "$dst" && echo "✓ $name"
+                SYNC_COUNT=$((SYNC_COUNT+1))
+            fi
+        fi
+    done
+else
+    # 同步指定分类
+    src="$DOTFILES_DIR/skills/$1"
+    dst="$HERMES_DIR/$1"
+    if [ -d "$src" ]; then
+        cp -r "$src" "$dst" && echo "✓ $1 synced"
+        SYNC_COUNT=1
+    else
+        echo "✗ $1 not found in dotfiles"
+        exit 1
+    fi
+fi
+
+echo "---"
+echo "Synced: $SYNC_COUNT categories"
