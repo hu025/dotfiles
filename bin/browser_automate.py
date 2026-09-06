@@ -42,6 +42,19 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# 可选依赖：OCR (pytesseract) + 重试 (tenacity) + 多步规划 —— 缺失时优雅 fallback
+try:
+    import pytesseract  # noqa: F401  # type: ignore
+    from PIL import Image  # noqa: F401  # type: ignore
+    _OCR_AVAILABLE = True
+except Exception:
+    _OCR_AVAILABLE = False
+try:
+    from tenacity import retry, stop_after_attempt, wait_exponential  # noqa: F401
+    _RETRY_AVAILABLE = True
+except Exception:
+    _RETRY_AVAILABLE = False
+
 
 # ─────────────────────────────────────────────────────────────
 # 常量与路径
