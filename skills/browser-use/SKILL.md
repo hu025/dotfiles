@@ -7,7 +7,7 @@ description: AI浏览器自动化：browser-use库控制真实浏览器完成网
 
 ## 核心数据
 - **GitHub**: github.com/browser-use/browser-use
-- **stars**: 108K+（2026）
+- **stars**: 110K+（2026）
 - **License**: MIT
 - **Python**: >= 3.11
 
@@ -45,6 +45,22 @@ async def browse_task(task: str):
 - 思维模式（use_thinking=True）
 - 1000+ 集成（Gmail, Slack, Notion等）
 - Cloud API：stealth浏览器 + proxy轮换 + CAPTCHA处理
+
+## MCP Server生态（2026新增）
+- **mcp-browser-use** (Saik0s): browser-use封装为MCP server → Claude/任意MCP客户端可调用
+  `pip install mcp-browser-use`
+- **BrowserMCP** (browsermcp): 复用用户本地浏览器profile，避免bot检测，隐私优先
+  `pip install browsermcp`
+- **WebMCP**: Chrome 149 origin trial，AI agent通过MCP协议控制浏览器
+
+## Benchmark（2026）
+- WebVoyager: browser-use 89.1% > OpenAI CUA 87% > Comet 87%
+- WebArena: Comet > browser-use（复杂多站任务）
+- Odysseys: browser-use #1（87.4% accuracy）
+
+## Chrome DevTools for agents（2026）
+Chrome DevTools新增agent调试支持：console logs / network / accessibility tree实时可见。
+现已支持browser-use等20+ coding agent。
 
 ## CLI 快速使用
 ```bash
