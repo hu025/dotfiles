@@ -15,7 +15,7 @@ Use this guide when choosing a terminal coding agent or delegating repo edits.
 |---|---|---|---|---|
 | Claude Code | CLI, IDE, cloud | Anthropic; API/subscription | Strong repo reasoning, shell workflows, agents | Proprietary ecosystem/cost |
 | Codex CLI | CLI, IDE, cloud | OpenAI models | Sandboxed coding, terminal automation | Provider lock-in; rapidly changing product |
-| Aider | Terminal | BYOK, model-agnostic, local | Git-native edits/commits, simple and scriptable | Less autonomous orchestration |
+| Aider | Terminal | BYOK, model-agnostic, local | Git-native edits/commits, Architect dual-model mode, Watch mode with AI!/AI? inline comments, tree-sitter 130+ languages, repo-map with graph ranking | Less autonomous orchestration; no native MCP |
 | Cline | VS Code/JetBrains, CLI | BYOK, local, any provider | Explicit Plan/Act approvals, MCP | Editor-centric; setup varies by model |
 | Continue | IDE, CLI | BYOK/local/open models | Open-source customization and rules | More configuration; CLI maturity varies |
 | Cursor | AI-native IDE, CLI/cloud | Managed Cursor models/providers | Excellent inline context and background agents | Closed IDE; usage pricing |
@@ -51,4 +51,5 @@ Verified/Pro, task-specific replay tests, patch quality, cost, latency, and appr
 - Artificial Analysis coding-agent comparison (Cursor, Claude Code, Cline, Aider, others).
 - IBM, “What Is HumanEval?” (published 2026-02-23).
 - BenchLM HumanEval page (September 2026 snapshot; marked stale).
+- Aider GitHub releases v0.77–v0.86 (2026 major releases: Architect mode, Watch mode, tree-sitter 130+ languages, Python 3.14, GPT-5/Grok-4/Gemini 3 support). https://github.com/Aider-AI/aider/releases
 - MorphLLM 2026 coding-agent comparison (use as secondary, vendor-adjacent source).
