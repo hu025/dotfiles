@@ -49,6 +49,22 @@ done
 - 记忆是持久快照（不常变化的事实）
 - Session Search 是动态查询（问"上次怎么处理的X"）
 
+## Skill 加载优化（RFC #64876 发现）
+
+当前问题：Skill router 永久加载全部 150 skill descriptions（17k chars）
+原因：router 指令"Partially relevant skills MUST be loaded"导致过度加载
+
+优化方案：
+1. skill description 字段 ≤ 60 chars，极简 self-contained
+2. 分类目录结构：user-profile/ project/ environment/ procedural/
+3. 利用 `skills_list` 作为天然索引（已返回 name + description）
+4. agent 主动判断 `skill_view` 所需 skill
+
+工具 schema 优化：
+- tool_search deferral 阈值 10% context window → 对于 1M context = 105k tokens，永不触发
+- 大量简单对话仍有 ~65k chars tool schema 开销
+- 按需加载工具：只在 skill 实际需要时才加载其 schema
+
 ## 优化后记录
 
 ```bash
