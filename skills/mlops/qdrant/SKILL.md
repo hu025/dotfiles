@@ -1,13 +1,20 @@
 ---
 name: qdrant-vector-search
 description: High-performance vector similarity search engine for RAG and semantic search. Use when building production RAG systems requiring fast nearest neighbor search, hybrid search with filtering, or scalable vector storage with Rust-powered performance.
-version: 1.0.0
+version: 2.0.0
 author: Orchestra Research
 license: MIT
-dependencies: [qdrant-client>=1.12.0]
+dependencies: [qdrant-client>=1.17.0]
 metadata:
   hermes:
     tags: [RAG, Vector Search, Qdrant, Semantic Search, Embeddings, Similarity Search, HNSW, Production, Distributed]
+  updates_2026:
+    - v1.19 TurboQuant 4-bit (64x compression)
+    - v1.19 Cold/Pinned/Cached memory strategy
+    - v1.17 Relevance Feedback Query
+    - v1.17 Composable Vector Search
+    - v1.17 Qdrant Edge (on-device/IoT)
+    - v1.17 Unlimited Update Queue + back-pressure
 
 ---
 
@@ -486,11 +493,61 @@ client = QdrantClient(
 - **[Advanced Usage](references/advanced-usage.md)** - Distributed mode, hybrid search, recommendations
 - **[Troubleshooting](references/troubleshooting.md)** - Common issues, debugging, performance tuning
 
-## Resources
-
-- **GitHub**: https://github.com/qdrant/qdrant (22k+ stars)
+- **GitHub**: https://github.com/qdrant/qdrant (34k+ stars)
 - **Docs**: https://qdrant.tech/documentation/
 - **Python Client**: https://github.com/qdrant/qdrant-client
 - **Cloud**: https://cloud.qdrant.io
-- **Version**: 1.12.0+
+- **Version**: 1.19.0 (Aug 2026)
 - **License**: Apache 2.0
+
+---
+
+# 2026 Major Updates (v1.17–v1.19)
+
+## v1.19: TurboQuant 4-bit + Memory Tiering
+
+**TurboQuant 4-bit**: 仅存储4-bit量化向量，内存压缩40-64x，精度85-92%（二阶段检索可接受）：
+| 模式 | 内存 | 精度 | 适用 |
+|------|------|------|------|
+| Float32 | 100% | 100% | 小数据集 |
+| SQ | ~25% | 95-99% | 一般生产RAG |
+| TurboQuant | 1.5-2.5% | 85-92% | 百亿级，成本敏感 |
+
+**Cold/Pinned/Cached分级内存**: Pinned锁入RAM / Cached标准缓存 / Cold按需加载。
+
+**Prefix Matching**: 高基数元数据过滤（百万级用户ID/路径）性能大幅提升。
+
+## v1.17: Agent-Native Primitives (Mar 2026)
+
+**Relevance Feedback Query**: 无需重训练embedding，通过positive/negative examples动态调整评分。适用：用户点击/跳过反馈，Agent迭代优化检索。
+
+**Composable Vector Search**: 一次query可自由组合dense+sparse+metadata+relevance，query time动态决策，适合agentic AI工作流。
+
+**Unlimited Update Queue + Back-pressure**: 100万pending changes，支持recovery/批量操作期间自动限流。
+
+**Qdrant Edge**: 轻量级引擎，运行于机器人/移动端/IoT本地，离线隐私优先，与Cloud统一数据架构。案例：Bosch工业机器人视觉embedding本地处理后同步云端。
+
+## 2026 Enterprise
+- **$50M Series B**（AVP领投）
+- OpenAI ChatGPT / Bosch工业机器人生产采用
+- 250M+下载，34k stars
+
+## 生产选型决策树（2026更新）
+
+```
+<50M chunks?
+├── Postgres已有 → pgvector（零新增）
+└── 否 → 元数据过滤复杂?
+    ├── 是 → Qdrant self-hosted
+    └── 否 → 需混合搜索?
+        ├── 是 → Weaviate
+        └── 否 → 十亿级 → Milvus/Zilliz
+```
+
+**经验（100+部署）：** 4团队12个月内从Pinecone迁回pgvector；同规模Pinecone $40k/月 vs 自托管 $4k/月；Chroma生产不适合（水平扩展缺失+全表扫描）。
+
+## 来源
+- [v1.19 Release Notes](https://github.com/qdrant/qdrant/releases/tag/v1.19.0)
+- [Top 15 Vector DB 2026](https://medium.com/@pratik-rupareliya/top-15-vector-databases-in-2026-a-production-decision-guide-from-100-enterprise-deployments-dd58a04f51a5)
+- [Qdrant 2026 News](https://posts.terabox.com/hub/latest-qdrant-news-and-technical-updates-for-production-ai-infrastructure)
+- [Vector DB March 2026](https://ranksquire.com/2026/03/26/vector-database-news-march-2026/)
