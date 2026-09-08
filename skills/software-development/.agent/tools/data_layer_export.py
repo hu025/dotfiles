@@ -257,8 +257,6 @@ def normalize_harness(value: Any) -> str:
     key = slug(value)
     if "claude" in key:
         return "claude-code"
-    if "openclaw" in key:
-        return "openclaw"
     if "hermes" in key:
         return "hermes"
     if "codex" in key:
@@ -688,7 +686,6 @@ def build_kpi_summary(agent_events: list[dict[str, Any]], cron_runs: list[dict[s
         ("cron_runs_per_day", round(len(cron_runs) / days, 3), "runs/day", "Observed scheduled-agent cadence."),
         ("events_per_day", round(len(agent_events) / days, 3), "events/day", "Observed non-cron agent activity cadence."),
         ("active_agents", active_agents, "agents", "Distinct hashed agent/run identities observed."),
-        ("harnesses", len(harnesses), "harnesses", "Distinct harnesses such as Claude Code, Hermes, OpenClaw, Codex, or Cursor."),
         ("workflows", len(workflows), "workflows", "Distinct workflow names observed."),
         ("categories", len(categories), "categories", "User-defined resource categories observed."),
         ("successes", successes, "runs", "Runs marked success."),

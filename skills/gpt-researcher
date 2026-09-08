@@ -1,0 +1,177 @@
+# GPT Researcher 技能文档
+
+**触发词**：深度研究、自动搜索报告、网络调研、多智能体研究
+**研究主题**：GPT Researcher 自主深度研究 Agent（assafelovic/gpt-researcher）
+
+---
+
+## 核心定位
+
+GPT Researcher 是**首个开源深度研究 Agent**， Carnegie Mellon 大学 DeepResearchGym（2025-05）评估中：
+
+| 指标 | 成绩 | 排名 |
+|------|------|------|
+| Citation Precision | 85.36% | #1（唯一双项>85%） |
+| Citation Recall | 90.82% | #1 |
+| Report Clarity | 83.70% | #1 |
+| Report Insightfulness | 78.01% | #1 |
+| Key Point Recall | 64.67% | #1 |
+
+- **Stars**: 29,350 | **License**: Apache-2.0
+- **下载量**: 数百万次 | **贡献者**: 数百人
+- Meta/Google/Nvidia/Stanford/Harvard/MIT/Microsoft/IBM 等团队使用
+
+---
+
+## 核心架构：Planner + Execution 双 Agent
+
+```
+用户查询
+    ↓
+Planner Agent（规划问题）
+    ↓（并行）
+Execution Agent × N（抓取每个子问题）
+    ↓
+Publisher（聚合 + 生成带引用的报告）
+```
+
+- **平均任务耗时**: ~2 分钟
+- **平均成本**: ~$0.005（使用 gpt-4o-mini 规划 + gpt-4o 执行）
+- **报告长度**: 2,000+ 词，支持 PDF/Docx/Markdown/JSON/CSV 导出
+
+---
+
+## 关键特性
+
+### 多 LLM 支持
+支持 100+ LLM：OpenAI / Anthropic Claude / Google Gemini / Mistral / DeepSeek / Cohere / Groq / Ollama（本地）/ LiteLLM / Azure OpenAI / AWS Bedrock / HuggingFace
+
+### 多 Retriever 支持
+Tavily / Bing / Google Custom Search / DuckDuckGo / SearXNG / Serper / Exa / ArXiv / PubMed / 自定义 MCP / 本地文档
+
+### 多格式输出
+PDF / DOCX / Markdown / JSON / CSV
+
+### 观测性（Observability）
+- **LangSmith**: `LANGCHAIN_TRACING_V2=true` + `LANGCHAIN_API_KEY`
+- **Monocle**: OpenTelemetry 追踪，`pip install "gpt-researcher[monocle]"` + `MONOCLE_TRACING=true`
+
+---
+
+## 多 Agent 模式
+
+### LangGraph 多 Agent
+`multi_agents/langgraph/` 下提供完整的 LangGraph 实现：
+- Planner Agent（规划研究问题）
+- Researcher Agent（并行抓取）
+- Synthesizer Agent（汇总报告）
+- 集成 LangSmith 追踪
+
+### AG2 多 Agent
+`multi_agents/ag2/` 下提供 AG2（原 AutoGen）实现
+
+### 观测性集成
+```bash
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=your_api_key
+export LANGCHAIN_PROJECT="gpt-researcher"
+```
+
+---
+
+## MCP Server（重点）
+
+**仓库**: https://github.com/assafelovic/gptr-mcp
+
+Claude Desktop 等 AI 应用通过 MCP 调用 GPT Researcher 的深度研究能力。
+
+暴露工具：
+- `deep_research(query)` — 深度研究
+- `quick_search(query, retriever?)` — 快速搜索
+- `write_report(query, context?)` — 生成长篇报告
+- `get_research_sources()` — 获取来源列表
+- `get_research_context()` — 获取累积上下文
+
+Transport：stdio / SSE / Streamable HTTP
+
+### MCP 配置示例
+```json
+{
+  "mcpServers": {
+    "gptr": {
+      "command": "uvx",
+      "args": ["gptr-mcp"]
+    }
+  }
+}
+```
+
+---
+
+## 安装使用
+
+### PyPI（一行安装）
+```bash
+pip install gpt-researcher
+```
+
+### Docker
+```bash
+docker run -e OPENAI_API_KEY=sk-xxx gpt-researcher
+```
+
+### FastAPI Server
+```bash
+python -m uvicorn main:app --host 0.0.0.0 --port 8000
+# WebSocket: /ws（流式研究）
+# REST: /openapi.json
+```
+
+### Python API
+```python
+from gpt_researcher import GPTResearcher
+
+researcher = GPTResearcher(
+    query="Nvidia stock analysis 2026",
+    report_type="research_report",
+    source="web"
+)
+context = await researcher.conduct_research()
+report = await researcher.write_report()
+```
+
+### 本地文档研究
+```python
+researcher = GPTResearcher(
+    query="...",
+    report_source="local"  # 改为 local
+)
+```
+
+---
+
+## 与现有技能的关系
+
+- **与 Letta/Agno/SWE-agent 的区别**：GPT Researcher 专注深度研究，不做持续记忆/编码/执行
+- **与 browser-use 的区别**：专注研究任务而非通用浏览器操作
+- **与 OpenAgents 的区别**：OpenAgents 是通用 Agent 平台，GPT Researcher 是专用研究 Agent
+- **可互补使用**：Hermes 用 browser-use 导航 + GPT Researcher 做深度研究 + Letta 做记忆
+
+---
+
+## 适用场景
+
+- 行业早报搜集（自动生成带引用的早报）
+- 竞品分析（多源汇总）
+- 学术调研（ArXiv/PubMed 集成）
+- 市场研究（长报告生成）
+- MCP 工具暴露给 Claude Desktop 做深度研究
+
+---
+
+## 来源
+
+- https://github.com/assafelovic/gpt-researcher
+- https://gptr.dev/
+- https://docs.gptr.dev/
+- https://arxiv.org/abs/2505.19253（DeepResearchGym 论文）
