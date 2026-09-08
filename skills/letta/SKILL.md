@@ -1,37 +1,55 @@
 ---
 name: letta
-description: Letta (formerly MemGPT) — stateful agents with tiered memory architecture, sleep-time compute, and git-backed Context Repositories. Use when building agents that learn and self-improve over time.
+description: Letta (formerly MemGPT) — stateful agents with persistent memory. Two repos: letta-ai/letta (landing page) and letta-ai/letta-code (active). Agent SDK v2 (TS) has MemFS/dreaming/mods; V1 SDK (Python) is legacy. Use when building stateful learning agents.
 triggers:
-  - Letta agent memory
-  - stateful AI agent
-  - agent self-improvement
-  - MemGPT replacement
-  - tiered memory architecture
-  - sleep-time compute
+  - Letta MemGPT stateful agent
+  - agent memory tiered architecture
+  - MemFS git-tracked memory
+  - Agent SDK v2 TypeScript
 category: agent-engineering
 ---
 
 # Letta — Stateful Agents with Persistent Memory
 
-## What It Does
+## REPO SPLIT (Critical — Updated 2026-09)
 
-Letta builds AI agents that maintain persistent memory across sessions — they learn, adapt, and improve over time rather than starting fresh each conversation. Formerly MemGPT, now a full platform with CLI, GUI, server, and cloud.
+| Repo | Role |
+|------|------|
+| `letta-ai/letta` | Landing page + archived v1 server (Python) |
+| `letta-ai/letta-code` | Active development — agent harness, CLI, App Server, channels |
+
+**Current focus: `letta-code` for all new work.**
+
+## Two SDKs
+
+| Feature | V1 SDK (legacy) | Agent SDK v2 |
+|---------|----------------|--------------|
+| Languages | Python, TypeScript | TypeScript only |
+| Self-hosting | No (cloud only) | Yes (WebSocket endpoint) |
+| MemFS / git-tracked memory | ❌ (blocks only) | ✅ |
+| Skills / Subagents / Mods | ❌ | ✅ |
+| Channels (Slack/Telegram/Discord) | ❌ | ✅ |
+| Pre-made bash toolsets | ❌ | ✅ |
+| Persistent filesystem | ❌ | ✅ |
+| Similar to | OpenAI Responses API | Claude Agent SDK |
+
+**V1 SDK is legacy. New projects → Agent SDK v2.**
 
 ## Core Capabilities
 
-- **Tiered Memory Architecture**: Organizes memory into tiers (recent, archived, core) with automatic archival — mimics human memory hierarchy
-- **Sleep-Time Compute**: "Memory editing agents" run in parallel during idle — the main agent focuses on tasks while a subconscious agent consolidates memory
-- **Context Repositories (Feb 2026)**: Git-backed memory filesystem — every memory change is versioned with commit messages; enables multi-agent collaboration via git
-- **Self-Improvement in Token Space**: Agents programmatically rewrite their own context/prompts to improve behavior
-- ** `/palace` — Memory Visualization**: View agent's memory state as a palace/loci visualization
-- ** `/doctor` — Memory Audit**: Diagnose and fix memory quality issues
-- **Agent File Format (.af)**: Open serialization format for sharing stateful agents across frameworks
-- **Multi-Channel**: Terminal CLI, Web GUI, Desktop apps (macOS/Windows/Linux), Slack/Telegram/Discord, Cloud
+- **MemFS**: Git-tracked memory filesystem — every memory change is versioned with commit messages; dream-time consolidation
+- **Agent Dreaming**: Sleep-time compute — sub-agent consolidates memory while main agent sleeps
+- **Mods (Self-Modifying Harness Extensions)**: Agents can extend their own tool harness at runtime
+- **Subagents**: Hierarchical multi-agent with shared memory blocks
+- **Context Repositories**: Git-backed collaboration, multi-agent git sync
+- **Channels**: Native Slack/Telegram/Discord integrations via Letta Code
+- **Letta Evals**: Open-source evaluation framework for stateful agents (Context-Bench)
+- **Memory Omni-Tool (Sep 2025)**: Claude Sonnet 4.5 integration for enhanced memory
 
 ## Installation
 
 ```bash
-# npm (fastest)
+# Agent SDK v2 (TypeScript — active development)
 npm install -g @letta-ai/letta-code
 
 # Launch interactive terminal
@@ -43,7 +61,7 @@ letta --new-agent --personality tutorial
 # App server (local or self-hosted)
 letta server
 
-# Docker
+# Docker (self-hosted)
 docker run -p 8282:8282 lettaai/letta:latest
 ```
 
@@ -59,41 +77,33 @@ docker run -p 8282:8282 lettaai/letta:latest
 /search         — Search across all messages and agents
 ```
 
-## Hermes Integration
+## v0.16.7 Key Updates (March 2026)
 
-Letta's self-improvement mechanisms are the most relevant for Hermes:
+- Context window default raised from **32k → 128k**
+- **MiniMax M2.7** model support added
+- Compaction overhauled (fixes double-compaction loops)
+- Summarizer now remembers plan files, GitHub PRs, structured content
+- Git memory sync deferred until stream close (reduces mid-stream failures
+- Block limits deprecated — blocks now grow freely
+- Conversation forking with shared message history
+- Security: local filesystem access blocked via ImageContent bypass
+
+## Hermes Integration Points
 
 ```python
-# Letta's agent can programmatically update its own memory blocks
-# Hermes can adopt similar patterns:
-# 1. Store "lessons learned" in a memory block
-# 2. On task completion, agent reflects and updates memory
-# 3. Sleep-time consolidation → refine/improve stored knowledge
+# 1. MemFS-style git memory: Hermes could track skill evolution in git
+# 2. Agent dreaming: reflection step after complex tasks → update memory
+# 3. Mods/harness extensions: Hermes could adopt plugin-style tool discovery
+# 4. Letta Evals: use Context-Bench to evaluate Hermes memory quality
 
-# Letta also exports .af agent files — Hermes could:
-# - Import/export agent state for backup/migration
-# - Share agent configurations between Letta and Hermes
+# Architecture pattern worth adopting:
+# Task → Execute → Reflection → Memory update → Next task improved
+# "Sleep-time compute": sub-agent rewrites memory while main agent sleeps
 ```
-
-## Architecture Insight for Hermes
-
-Letta's key insight: **agents should be able to edit their own memory**. Hermes can borrow this pattern:
-
-- Add a "reflection" step after complex tasks — agent stores what worked/didn't
-- Implement a "memory importance" score — frequently used facts get higher weight
-- Use `/doctor` style self-audit to identify memory gaps
-
-## Self-Improvement Loop
-
-```
-Task → Agent executes → Reflection →
-Memory update (what worked?) → Next task improved
-```
-
-Letta's "sleep-time compute" is the extreme version: dedicated sub-agent that rewrites memory while main agent sleeps.
 
 ## Pitfalls
 
-- Letta v1 server is archived; active development is in `letta-ai/letta-code`
-- Memory persistence requires a running server (not fully library-based like Mem0)
-- Tiered memory management adds complexity — start with simple flat memory if new to agent memory
+- **Two repos**: Don't use `letta-ai/letta` for new work — it's archived
+- **Agent SDK v2 is TypeScript-only** — Python dropped; use V1 SDK for Python
+- Memory persistence requires a running server (not library-based like Mem0)
+- Block limits removed in v0.16.7 — manage block size via other means if needed
