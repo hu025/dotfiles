@@ -1,7 +1,7 @@
 ---
 name: notion
-description: "Notion API + ntn CLI: pages, databases, markdown, Workers."
-version: 2.0.0
+description: "Notion API + ntn CLI + Custom Agents + Workers + Agent SDK (2026)."
+version: 3.0.0
 author: community
 license: MIT
 platforms: [linux, macos, windows]
@@ -9,11 +9,24 @@ prerequisites:
   env_vars: [NOTION_API_KEY]
 metadata:
   hermes:
-    tags: [Notion, Productivity, Notes, Database, API, CLI, Workers]
+    tags: [Notion, Productivity, Notes, Database, API, CLI, Workers, Custom Agents, Agent SDK]
     homepage: https://developers.notion.com
+  research: 2026-09-11
 ---
 
 # Notion
+
+> **2026 major additions:** Custom Agents (Feb 2026), Notion 3.5 Developer Platform — External Agents API, Workers, Database sync, Webhook triggers, Agent SDK (May 2026), AI Autofill, Skills system, n8n MCP integration.
+
+## Overview: Five Notion Interfaces
+
+| Interface | What it does | Access |
+|---|---|---|
+| **Notion API** (REST) | Read/write pages, databases, files | `ntn api ...` or `curl` |
+| **Custom Agents** | Autonomous AI teammates (scheduled/triggered) | Notion UI + MCP |
+| **Notion Workers** | Hosted TypeScript runtime (syncs, tools, webhooks) | `ntn workers ...` |
+| **External Agents API** | Orchestrate third-party agents (Claude, Codex, etc.) from Notion | Alpha API |
+| **Notion Agent SDK** | Embed Notion agents inside your own apps | Alpha SDK |
 
 Talk to Notion two ways. Same integration token works for both — pick by what's available.
 
@@ -63,6 +76,40 @@ fi
 ```
 
 Windows users: skip step 2 entirely until native `ntn` ships — Path B works fine. If you want CLI ergonomics now, install `ntn` inside WSL2.
+
+## Custom Agents (v3.3+, Feb 2026)
+
+Notion's built-in autonomous AI teammates. Available in Notion UI at Settings → Agents.
+
+**Capabilities:**
+- Autonomous task triaging, Q&A, daily standups, status reports, inbox zero
+- Triggered by schedule or event (e.g., after AI Meeting Notes finish)
+- Access Slack, Mail, Calendar, Linear, Figma, HubSpot via MCP
+- Skills system: save workflows as reusable skills for your agent
+- Suggest Edits mode: propose changes instead of applying directly
+- Every run logged, changes visible and reversible
+
+**Pricing:** Free through May 3, 2026. After that, Business/Enterprise add-on via Notion credits.
+
+**For Hermes:** Use Notion MCP server to connect Custom Agents to Hermes workflows. MCP now supports meeting notes, block comments, and database operations (91% more token-efficient).
+
+## External Agents API (v3.5, May 2026) — Alpha
+
+Notion as an **orchestration layer** for external coding agents.
+
+- Bring your own agents: Claude, Codex, Decagon, or self-built
+- Notion routes tickets to the right agent → agent proposes fix → team approves
+- Join waitlist: `https://notion.pages.dev.notion.co/351b35e6e67f80128a8cf585188cf668`
+
+**Use case for Hermes:** Notion becomes the shared canvas where agents work together on team projects.
+
+## Database Sync (v3.4 part 2, Apr 2026) — Beta
+
+Workers-powered: sync any data source (Zendesk, Salesforce, Strava, etc.) into Notion databases on a schedule. No servers to manage. Workers run on Notion infrastructure.
+
+## AI Autofill (v3.4 part 2)
+
+AI-powered column enrichment in databases, powered by Custom Agents. Continuously extract, categorize, and update rows. Simple fills included in Business/Enterprise; agent-powered fills use Notion credits.
 
 ## API Basics
 
@@ -392,6 +439,18 @@ ntn workers webhooks list
 ```
 
 When asked to build a Worker, scaffold with `ntn workers new`, write the code in `src/index.ts`, set any secrets with `ntn workers env set`, and deploy. Notion's docs at https://developers.notion.com/workers cover the full API surface.
+
+## Webhook Triggers (v3.5, May 2026) — Beta
+
+Any external app can now trigger Notion workflows via webhooks. A Worker receives the webhook, runs logic, and acts in Notion or calls other APIs. Use cases: close tasks when PR merges, update CRM on subscription change, create onboarding doc when offer signed.
+
+## Notion Agent SDK (v3.5, May 2026) — Alpha
+
+Embed Notion agents inside your own tools. Trigger deal reports from CRM, answer questions in MS Teams/Discord with verified Notion knowledge, pull context into dashboards (Amplitude, Hex). Join waitlist: `https://notion.pages.dev.notion.co/357b35e6e67f8012bb0dd3f95c9be810`
+
+## Agents "Hall of Fame" (v3.5)
+
+Pre-built Custom Agent library from companies like Ramp, Clay, Vercel. Each comes with checklist of required databases/pages/tools and a starter prompt. Browse: `https://notion.notion.site/Getting-Started-with-Custom-Agents-655efdeead058331841881cc46dbb1df`
 
 ## Notion-Flavored Markdown (used by `/markdown` endpoints)
 
