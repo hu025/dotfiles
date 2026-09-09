@@ -190,7 +190,9 @@ OpenHands fits into Hermes as:
 | Median time-to-PR | ~18 min | ~14 min | ~22 min |
 | Test pass rate before review | ~69% | ~71% | ~63% |
 
-> SWE-bench Verified scores are ~20-25 points above real-world PR acceptance rates due to implicit codebase conventions and reviewer expectations benchmarks don't capture.
+> MSR 2026 (7,156 real PRs across 5 agents): ~46% of AI-proposed fixes are rejected. SWE-bench Verified scores are ~20-25pp above real-world PR acceptance rates due to implicit codebase conventions benchmarks don't capture.
+>
+> **Devin Fusion (June 2026):** 88% of Cognition's own merged PRs driven entirely by automated Fusion router. 60% cost reduction vs pure frontier on FrontierCode benchmark.
 
 ## Pitfalls
 
