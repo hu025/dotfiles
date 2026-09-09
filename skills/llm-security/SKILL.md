@@ -60,6 +60,57 @@ tests:
 
 CI 集成：`promptfoo eval --fail-on` + 阈值（如 `0.9`）。
 
+### MCP 安全测试（v2026 新增）
+
+Promptfoo 支持三种 MCP 安全测试场景（Jul 2026）：
+
+**场景 1：可信客户端 → MCP Server**
+```yaml
+# 通过中间应用（如 Dify）测试 MCP server
+targets:
+  - id: openai:gpt-5
+    config:
+      mcp:
+        enabled: true
+        servers:
+          - name: your-mcp-server
+            path: ./path/to/your/mcp-server
+```
+
+**场景 2：直接 MCP 测试**
+```yaml
+# 绕过应用直接测 MCP server 协议
+providers:
+  - id: mcp
+    label: 'Direct MCP Testing'
+    config:
+      enabled: true
+      servers:
+        - name: your-mcp-server
+          path: ./path/to/your/mcp-server
+```
+
+**场景 3：MCP OAuth + Token Refresh**
+```yaml
+redteam:
+  plugins:
+    - mcp-oauth:  # MCP OAuth + proactive token refresh
+```
+
+**OWASP Agentic AI 新增（2026-01）**
+- OWASP Top 10 for Agentic Applications：完整 T1-T15 威胁映射
+- OWASP API Security Top 10：API 安全测试示例
+
+**RAG Source Attribution（2026-01）**：测试 RAG 系统是否正确归因来源
+
+**可复用自定义策略库**：自定义策略可保存到库并跨红队评估复用
+
+```bash
+# GitHub Actions CI 集成
+npx promptfoo@latest redteam generate
+# 自动生成 300k+ 社区威胁情报驱动的对抗性输入
+```
+
 ## Hermes 加固建议
 
 1. **Skill 隔离**：每个 skill 独立 workdir；禁止 `subprocess shell=True` 直传用户输入。
