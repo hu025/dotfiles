@@ -82,16 +82,67 @@ ollama run llama3.2:3b "解释什么是ETF"
 **Piper TTS 已于 2025年10月归档**（rhasspy/piper），但仍可使用。
 建议迁移到 **Kokoro TTS** 作为首选方案。
 
-## TTS 方案对比（2026）
+## TTS 方案对比（2026-09）
 
 | 方案 | 参数量 | 许可证 | CPU性能 | 备注 |
 |------|--------|--------|---------|------|
-| **Kokoro** | 82M | Apache-2.0 | 6x实时 | TTS Arena #1，音质最佳 |
+| **Kokoro** | 82M | Apache-2.0 | 6x实时 | TTS Arena #1，最快 |
+| **Chatterbox-Multilingual V3** | 500M | MIT | 需GPU | 零样本克隆，23+语言，中文专属模型 |
+| **Chatterbox-Turbo** | 350M | MIT | 中等 | 英文优先，paralinguistic tags |
+| **Chatterbox-Nano** | 110M | MIT | 3x实时(8核) | CPU最低延迟 |
 | Piper | - | - | 实时（RPi5） | 已归档，仍可用 |
-| Chatterbox | - | MIT | 需GPU | 10秒音频克隆声音 |
-| XTTS | - | 商用 | 需GPU | 语音克隆 |
+| XTTS v2 | ~2.1GB | CPML(非商用) | 需GPU | 语音克隆，非商用 |
 
-**Kokoro 安装**：`pip install kokoro-onnx` 或通过 Home Assistant Wyoming 集成
+## Chatterbox（重要更新 2026-09）
+
+**仓库**：https://github.com/resemble-ai/chatterbox（26K⭐，MIT许可证）
+
+### 模型矩阵（2026-09）
+
+| 模型 | 参数量 | 语言 | 核心特性 | 最佳场景 |
+|------|--------|------|----------|----------|
+| **Chatterbox-Multilingual V3** | 500M | 23+ | 说话人相似度↑，幻觉↓，PerTh水印，零样本克隆 | 全球应用，跨语言语音克隆 |
+| **Chatterbox-Turbo** | 350M | 英文 | 10步→1步解码，paralinguistic tags `[laugh]` | 低延迟英文语音代理 |
+| **Chatterbox-Nano** | 110M | 英文 | CPU 3x实时（8核），on-device | 内存/算力受限部署 |
+
+### 中文支持（重要）
+- 通用模型支持中文（23+语言之一）
+- **中文专属模型**：`ResembleAI/Chatterbox-Multilingual-zh-cmn`（Single Language Pack）
+- LatAm Spanish / Brazilian Portuguese / Spain Spanish / Portugal Portuguese / Hindi 也有专属模型
+
+### 安装使用
+```bash
+conda create -yn chatterbox python=3.11
+conda activate chatterbox
+git clone https://github.com/resemble-ai/chatterbox.git
+cd chatterbox
+pip install -e .
+```
+
+### Python API
+```python
+from chatterbox import ChatterboxTTS
+
+# 基础使用
+tts = ChatterboxTTS.from_pretrained("ResembleAI/chatterbox-turbo")
+audio = tts.tts("Hello world", audio_prompt_path="reference.wav")
+
+# 中文克隆（需5-20秒参考音频）
+tts = ChatterboxTTS.from_pretrained("ResembleAI/Chatterbox-Multilingual-v3")
+audio = tts.tts("你好世界", audio_prompt_path="zh_reference.wav")
+```
+
+### 许可证关键点（MIT）
+- Chatterbox全系（Turbo/Multilingual/Nano）均为MIT许可证
+- **可商用**：无需授权费/版税/收入分成
+- NVIDIA NIM也可用于生产部署
+- 所有输出含PerTh水印（音频溯源，符合EU AI Act）
+
+### Kokoro 安装
+```bash
+pip install kokoro-onnx
+# 模型：hexgrad/Kokoro-82M
+```
 
 ## STT 新方案：Speech-to-Phrase
 Home Assistant 2026 新增，比 Whisper 快 8 倍（<1秒 vs 8秒 on RPi4）。
