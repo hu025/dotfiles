@@ -18,7 +18,7 @@ Use this guide when choosing a terminal coding agent or delegating repo edits.
 | Aider | Terminal | BYOK, model-agnostic, local | Git-native edits/commits, Architect dual-model mode, Watch mode with AI!/AI? inline comments, tree-sitter 130+ languages, repo-map with graph ranking | Less autonomous orchestration; no native MCP |
 | Cline | VS Code/JetBrains, CLI | BYOK, local, any provider | Explicit Plan/Act approvals, MCP | Editor-centric; setup varies by model |
 | Continue | IDE, CLI | BYOK/local/open models | Open-source, `.continue/checks/` AI semantic checks on PRs, anti-slop rules, Mission Control CI integration | **ARCHIVED**: Acquired by Cursor (Jul 2026), repo read-only, v2.1.0 final |
-| Cursor | AI-native IDE, CLI/cloud | Managed Cursor models/providers | Excellent inline context and background agents | Closed IDE; usage pricing |
+|| Cursor | AI-native IDE, CLI/cloud | Managed Cursor models/providers | Excellent inline context and Background Agents (parallel VMs), BugBot PR reviewer, Memories project context, v1.7 Hooks (beta custom scripts), $29.3B valuation, $1B+ ARR | Closed IDE; usage pricing; rule management fragmented across .cursorrules/.cursor/rules/MCP |
 | OpenCode | CLI/desktop | Many providers, local | Terminal-first, open source, broad provider support | Fast-moving APIs/community |
 
 ## Selection rules
