@@ -1,0 +1,140 @@
+---
+name: goose
+description: "Local-first AI agent runtime (desktop/CLI/API) with YAML recipes and 70+ MCP extensions."
+version: 1.0.0
+license: Apache-2.0
+category: autonomous-ai-agents
+tags: [local-agent, MCP, recipes, YAML, Rust, AAIF, Linux-Foundation]
+triggers: [goose agent, local AI agent, goose recipes, MCP desktop agent, AAIF goose]
+---
+
+# goose — Local-First AI Agent Runtime
+
+## What it is
+
+goose is a **general-purpose AI agent that runs entirely on your machine** — not cloud-dependent, not editor-locked. It ships as a native desktop app, full CLI, and embeddable API, built in Rust for performance and portability.
+
+**Now hosted at the [Agentic AI Foundation (AAIF)](https://aaif.io/)** under the Linux Foundation, alongside MCP and AGENTS.md. This ensures neutral, community-governed governance.
+
+**Latest version**: v1.37 (June 2026), 19,740+ GitHub stars, Apache-2.0 license.
+
+## Core surfaces
+
+| Surface | Use case |
+|---|---|
+| **Desktop app** | Visual workspace, MCP app UIs, session management (macOS/Linux/Windows) |
+| **CLI** | Headless automation, CI/CD integration, scripted workflows |
+| **API** | Embed goose into custom systems, trigger from webhooks or job queues |
+
+## Core innovations (v1.36/v1.37)
+
+### 1. YAML Recipes — Agent behavior as code
+
+Recipes are declarative YAML files that package the complete agent configuration:
+- **Instructions**: system prompt + behavior definition
+- **Extensions**: which MCP tools the agent can use
+- **Parameters**: Jinja2-templated, user-configurable inputs
+- **Settings**: model provider, temperature, max_turns
+- **Sub-recipes**: compose complex workflows from smaller recipes
+- **Success validation**: shell checks, retry logic
+
+```yaml
+# recipes/scope.yaml
+version: "1.0.0"
+title: "Scope an issue"
+description: "Read the issue and the repo, produce an implementation plan"
+settings:
+  goose_provider: anthropic
+  goose_model: claude-opus-5
+extensions:
+  - type: builtin
+    name: developer
+parameters:
+  - key: context_path
+    input_type: string
+    requirement: required
+    description: "Path to the rendered issue context file"
+instructions: |
+  You are scoping, not building. Do not modify tracked files.
+prompt: |
+  Read {{ context_path }} and the repository, then write a plan.
+```
+
+Key insight: **Recipe changes are git diffs** — agent behavior is code-reviewed like any other code. Swapping models is a one-line change. The entire behavior lives in the repo.
+
+Sub-recipes enable sequential/parallel orchestration:
+```yaml
+sub_recipes:
+  - name: analyze_frontend
+    path: "./sub-recipes/frontend-analyzer.yaml"
+    description: "Analyze React components"
+    values:
+      severity: "high"
+  - name: security_scan
+    path: "./sub-recipes/security-scanner.yaml"
+    sequential_when_repeated: true  # Don't run in parallel
+```
+
+### 2. PreToolUse + Stop Hooks — Governance layer
+
+v1.36 introduced `PreToolUse` denial hooks to intercept and block tool calls before execution.
+v1.37 added blocking `Stop` hooks. Combined with read-only mounts and path checks, this creates a real enforcement boundary outside the agent itself.
+
+### 3. 70+ MCP Extensions
+
+MCP is goose's native integration protocol. Extensions can render **interactive UIs inside goose Desktop** — buttons, forms, visualizations — enabling agent-powered tools without custom UI code.
+
+### 4. ACP (Agent Client Protocol)
+
+Separates the agent runtime from the interface. goose can be controlled from a terminal, Slack bot, IDE plugin, or custom dashboard via a standard protocol. Clients can send per-session system prompts without interfering with each other.
+
+### 5. Declarative YAML Providers
+
+New in v1.36/v1.37: many providers are now configured entirely in YAML, making provider management infrastructure-as-code.
+
+**9 new providers added**: Alibaba Qwen/DashScope, Perplexity, Databricks AI Gateway, Vercel AI Gateway, xAI SuperGrok, Scaleway, NEAR AI Cloud, oMLX, GitHub Copilot `/responses`.
+
+### 6. Local inference improvements
+
+- Linux Vulkan acceleration
+- Alpine/musl builds for minimal environments
+- Windows CUDA artifacts
+- Native arm64 Linux runners
+- Strict GGUF model validation
+
+## When to use goose
+
+| Use goose when you need | Use alternatives when |
+|---|---|
+| Local, open-source agent runtime | Cloud-managed agent (Claude Code, Codex) |
+| Model/provider flexibility | First-party model integration |
+| YAML-defined agent behaviors (git-reviewable) | Dashboard-based agent config |
+| Headless containerized runs | Interactive IDE-first workflows |
+| MCP extension portability | Native plugin ecosystem |
+| Read-only mount enforcement | Full filesystem access |
+| Self-hosted, no cloud dependency | Managed cloud control plane |
+
+## Installation
+
+```bash
+# CLI install
+curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | bash
+
+# Desktop app: download from https://goose-docs.ai
+```
+
+## Integration with Hermes
+
+goose is **complementary to Hermes**:
+- Hermes: orchestrating multi-agent workflows, memory, scheduling, tool execution
+- goose: single-purpose YAML-defined agent tasks in containers
+
+Key insight from the Software Factory article: **let the harness be small, put controls below the agent**. goose runs one recipe in one container and exits — nothing carries over. For Hermes cron jobs that need isolated agent execution, goose recipes provide a clean, auditable pattern.
+
+## Sources
+
+- https://goose-docs.ai/ — Official documentation
+- https://aaif.io/projects/goose — AAIF project page
+- https://aaif.io/blog/goose-doubles-down-on-open-in-latest-two-releases — v1.36/v1.37 release notes (Angie Jones, AAIF VP)
+- https://martyndavies.me/blog/goose-as-the-harness — "Using Goose as the Harness in a Software Factory" — production recipe patterns, mount enforcement, path checks
+- https://block-goose.mintlify.app/guides/recipes — Recipe reference and sub-recipe patterns

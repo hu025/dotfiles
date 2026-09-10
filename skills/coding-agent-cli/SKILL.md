@@ -20,6 +20,7 @@ Use this guide when choosing a terminal coding agent or delegating repo edits.
 | Continue | IDE, CLI | BYOK/local/open models | Open-source, `.continue/checks/` AI semantic checks on PRs, anti-slop rules, Mission Control CI integration | **ARCHIVED**: Acquired by Cursor (Jul 2026), repo read-only, v2.1.0 final |
 || Cursor | AI-native IDE, CLI/cloud | Managed Cursor models/providers | Excellent inline context and Background Agents (parallel VMs), BugBot PR reviewer, Memories project context, v1.7 Hooks (beta custom scripts), $29.3B valuation, $1B+ ARR | Closed IDE; usage pricing; rule management fragmented across .cursorrules/.cursor/rules/MCP |
 | OpenCode | CLI/desktop | Many providers, local | Terminal-first, open source, broad provider support | Fast-moving APIs/community |
+| **Goose** | Desktop/CLI/API | 15+ providers, local, ACP | YAML Recipes (behavior as code), 70+ MCP extensions, PreToolUse/Stop hooks for governance, headless container runs, read-only mount enforcement | Apache-2.0, AAIF-governed; recipe-per-job model (stateless) |
 
 ## Selection rules
 
@@ -30,6 +31,7 @@ Use this guide when choosing a terminal coding agent or delegating repo edits.
 - Choose **Continue** for team-owned prompts, local models, and extensible IDE workflows.
 - Choose **Cursor** when an integrated editor and background execution matter most.
 - Choose **OpenCode** when an open, provider-neutral terminal agent is preferred.
+- Choose **Goose** when you want YAML-defined agent behaviors that live in git (behavior-as-code), headless container runs, and governance via PreToolUse/Stop hooks.
 
 ## Benchmark guidance
 
