@@ -19,6 +19,8 @@ SWE-agent is Princeton NLP's open-source agent for resolving real GitHub issues 
 
 The original "mini" reference (100 lines, >74%) refers to a stripped-down variant — current mainstream SWE-agent scores are well-documented on the official leaderboard.
 
+> **mini-swe-agent v2 is current** (Aug 2026). See [v2 migration guide](https://mini-swe-agent.com/latest/advanced/v2_migration/).
+
 ## Core Capabilities
 
 - **GitHub Issue → PR**: Autonomous end-to-end fix workflow — read, plan, code, test, PR
@@ -121,8 +123,32 @@ sandbox:
 - Lower score than OpenHands+CodeAct on same model budget
 - Mini-swe-agent variant is the recommended starting point
 
+## mini-swe-agent v2 Design Principles (Aug 2026)
+
+mini-swe-agent v2 is the current recommended version — used by Meta, NVIDIA, IBM, Essential AI, Nebius, Anyscale:
+
+- **No custom tools, only bash** — doesn't even need tool-calling interface; any model works
+- **Linear history** — each step appends to messages; trajectory = messages = prompt; trivial for debugging/FT
+- **subprocess.run per action** — every action is independent; easily swappable sandbox (`docker exec`); scales effortlessly
+- **v2 migration guide**: https://mini-swe-agent.com/latest/advanced/v2_migration/
+
+## SWE-Protégé: Expert-Protégé Pair Programming for SLMs
+
+SWE-Protégé (arxiv:2602.22124) is a post-training framework that teaches small language models to collaborate with expert models — analogous to human pair programming:
+
+- **Problem**: SLMs (≤10B) suffer from degenerative looping on long-horizon SWE tasks (~10% Pass@1)
+- **Solution**: SLM remains primary decision-maker; learns to selectively invoke expert when stalled
+- **Result**: Qwen2.5-Coder-7B-Instruct achieves **42.4% on SWE-bench Verified** (+25.4% over prior SLM SOTA), surpassing SWE-agent-LM-32B (40.2%)
+- **Sparse expert usage**: ~4 expert calls/task, only 11% of total tokens → **8.2× lower cost** than direct expert execution
+- **Two-phase training**: (1) SFT on expert-augmented trajectories; (2) Agentic RL with GRPO to discourage loops and shallow collaboration
+- **Key insight**: Learned when-to-escalate + how-to-follow-through is more effective than scaling model size
+
+This pattern is directly applicable to Herme's autonomous improvement: a lightweight SLM (e.g., Qwen2.5-Coder) could serve as the "protégé" working on routine tasks, escalating to the main model only when stalled.
+
 ## Sources
 
 - Official leaderboard: https://www.swebench.com/verified.html
 - GitHub: https://github.com/SWE-agent/SWE-agent
+- mini-swe-agent: https://mini-swe-agent.com
 - Paper: https://arxiv.org/abs/2405.15793
+- SWE-Protégé: https://arxiv.org/abs/2602.22124
