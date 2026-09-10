@@ -1,6 +1,6 @@
 ---
 name: openhands
-description: OpenHands — top open-source autonomous coding agent (68.4% SWE-bench Verified, MIT). CodeAct agent + Agent Canvas UI. Use when you need self-hosted autonomous PR generation, CI/CD GitHub automation, or the best open-source coding agent.
+description: OpenHands 1.0 — top open-source autonomous coding agent (68% SWE-bench Verified, 87K stars MIT). Docker security sandbox + Agent Canvas control center. Use when you need self-hosted autonomous PR generation, CI/CD GitHub automation, or the best open-source coding agent.
 triggers:
   - OpenHands
   - All-Hands-AI
@@ -16,7 +16,7 @@ category: coding-agent-cli
 
 ## What It Is
 
-OpenHands (formerly OpenDevin) by All-Hands-AI is the **top-performing open-source autonomous coding agent** as of 2026. MIT-licensed, 76K+ GitHub stars. Achieves **68.4% on SWE-bench Verified** with CodeAct v3 + Claude Opus 4.6 — second only to commercial top-tier agents.
+OpenHands (formerly OpenDevin) by All-Hands-AI is the **top-performing open-source autonomous coding agent** as of 2026. MIT-licensed, **87K+ GitHub stars**. Achieves **68% on SWE-bench Verified** with CodeAct v3 + Qwen3-Coder-480B (~$0.30/task) or 72% with Claude Sonnet 4.5 + extended thinking.
 
 Two key components in 2026:
 - **CodeAct agent**: The core agent — generates executable Python as actions (not JSON tool calls), runs in sandbox, observes output, iterates
@@ -29,6 +29,7 @@ Two key components in 2026:
 - **Multi-Agent Coordination**: `AgentDelegateAction` lets a main agent spawn specialized sub-agents
 - **Browser-Based Canvas UI**: Self-hosted web UI replacing legacy CLI/Local GUI
 - **Sandboxed Execution**: Docker isolation — agent can run arbitrary code safely
+- **1.0 Security Sandbox (Sep 2026)**: Production-grade Docker sandbox with configurable resource limits (CPU/memory caps per container), non-root execution via `SANDBOX_USER_ID=1000`, and LLM-based security analyzer rating every action LOW/MEDIUM/HIGH. High-risk actions (destructive commands, credential access) pause for human approval before execution. This is the piece that makes self-hosted production deployment viable.
 - **15 Benchmarks in One Harness**: SWE-Bench Lite, HumanEvalFix, WebArena, GPQA, GAIA, and more
 - **Bring-Your-Own-Model**: Works with any API-compatible LLM (Claude, GPT, Gemini, open-weight)
 - **Cross-Platform**: Local, Docker, VM, or cloud backend via Canvas
@@ -40,9 +41,10 @@ Two key components in 2026:
 
 | Configuration | Model | Verified | Full |
 |--------------|-------|---------|------|
-| OpenHands + CodeAct v3 | Claude Opus 4.6 | **68.4%** | 51.2% |
+| OpenHands + CodeAct v3 | Claude Sonnet 4.5 + ext thinking | **72%** | — |
+| OpenHands + CodeAct v3 | Qwen3-Coder-480B | **68%** | — |
+| OpenHands + CodeAct v3 | Claude Opus 4.6 | 68.4% | 51.2% |
 | OpenHands + CodeAct v2 | GPT-5.2 | 44.7% | 33.9% |
-| OpenHands + Claude 3.5 | Claude Sonnet 3.5 | ~55% | ~40% |
 | Augment Code SWE-Agent | Claude Opus 4.6 | 72.0% | 54.1% |
 | Cursor Background Agent | Claude Sonnet 4.6 | 65.7% | 48.9% |
 
@@ -80,17 +82,45 @@ docker run -it --rm --pull=always \
   --mount-cwd
 ```
 
-### CLI (Headless)
+### CLI (Headless) via uv
 
 ```bash
-# Install via pip
-pip install openhands
-
-# Or via uvx
-uvx --python 3.12 --from openhands-ai openhands serve
-
+# Requires Python 3.12+ and uv installed
+uv tool install openhands --python 3.12
+# Or upgrade
+uv tool upgrade openhands --python 3.12
 # Run headless (no GUI)
 openhands-cli --task "Fix the authentication bug in src/auth.py"
+```
+
+### 1.0 Docker Setup (Sep 2026 — with security sandbox)
+
+```bash
+# Production-grade sandbox with security analyzer
+docker run -it --rm \
+  --pull=always \
+  -e AGENT_SERVER_IMAGE_REPOSITORY=ghcr.io/openhands/agent-server \
+  -e AGENT_SERVER_IMAGE_TAG=1.26.0-python \
+  -e SANDBOX_USER_ID=$(id -u) \
+  -e SANDBOX_VOLUMES=$HOME \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.openhands:/root/.openhands \
+  --add-host host.docker.internal:host-gateway \
+  --name openhands-cli-$(date +%Y%m%d%H%M%S) \
+  python:3.12-slim \
+  bash -c "pip install uv && uv tool install openhands --python 3.12 && openhands"
+```
+
+Key: `SANDBOX_USER_ID=$(id -u)` ensures non-root execution (sandbox user matches host user permissions). `SANDBOX_VOLUMES` restricts which directories the sandbox can access.
+
+### Agent Canvas (Web UI)
+
+```bash
+# Install and launch Canvas UI
+uv tool install openhands --python 3.12
+openhands serve          # GUI on http://localhost:3000
+openhands serve --gpu    # With GPU support
+openhands serve --mount-cwd  # Mount current directory
 ```
 
 ### Python SDK
