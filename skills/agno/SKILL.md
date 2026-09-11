@@ -15,19 +15,20 @@ category: agent-engineering
 
 ## What It Does
 
-Agno is an open-source Python framework for building production-grade multi-agent systems. It provides the full stack: agents with tools, reasoning, memory, knowledge retrieval, agent teams, and a runtime to serve them. Known for extreme performance (~3μs agent instantiation, ~6.5KB memory footprint).
+Agno is an open-source Python framework for building production-grade multi-agent systems (Apache-2.0, **42.1K stars**). It provides the full stack: agents with tools, reasoning, memory, knowledge retrieval, agent teams, and a runtime to serve them. Known for extreme performance (~3μs agent instantiation, ~6.5KB memory footprint). 400 contributors, v2.5+.
 
 ## Core Capabilities
 
 - **Model Agnostic**: Unified interface to 23+ providers — OpenAI, Anthropic, Gemini, Groq, Mistral, Cohere, Ollama, and more
 - **Built-in Reasoning**: Three approaches — Reasoning Models, ReasoningTools, or custom chain-of-thought; reasoning is a first-class citizen
-- **Agent Teams**: Coordinate multiple agents (coordinate, collaborate, or supervisor patterns); narrow-scoped agents with shared context
-- **Knowledge & Retrieval**: Built-in Agentic RAG with 20+ vector databases; async and highly performant
+- **Agent Teams**: Coordinate multiple agents (coordinate, collaborate, supervisor patterns); narrow-scoped agents with shared context; Team Modes, HITL for Teams, Approval System
+- **Knowledge & Retrieval**: Agentic RAG as default (模型决定何时search); Hybrid Search (vector + keyword); Cohere Rerank v3.5重排序; 19种VectorDB (LanceDB/ChromaDB/Pinecone/Milvus等); 知识可写入=Agent可保存学习成果; Traditional RAG (retrieval before first call) also supported
 - **Memory & Storage**: Built-in `Storage` and `Memory` drivers for long-term memory and session storage
 - **Structured Outputs**: Return fully-typed Pydantic responses via model structured outputs or `json_mode`
 - **Pre-built FastAPI Routes**: Serve agents as HTTP endpoints in minutes
 - **Monitoring**: Real-time session and performance monitoring at agno.com (or self-host)
 - **AgentOS Runtime**: Run agents as production services with tracing, scheduling, RBAC
+- **MCP Integration**: Agent可作为MCP server暴露给coding agent (Cursor/VSCode/Windsurf); docs.agno.com/mcp 支持
 
 ## Installation
 
