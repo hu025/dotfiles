@@ -59,11 +59,22 @@ category: agent-engineering
 
 ### AutoGen → Microsoft Agent Framework (迁移中)
 
-**状态**: AutoGen进入维护模式；Microsoft Agent Framework 1.0 GA (2026-04-03, MIT, LTS)
+**状态**: AutoGen进入维护模式（2026-04）；Microsoft Agent Framework 1.0 GA (2026-04-03, MIT, LTS)
 
-**新框架**: 融合 Semantic Kernel + AutoGen 概念；.NET+Python双语言；A2A+MCP原生；6个provider一行切换
+**架构**: Semantic Kernel作foundation层，AutoGen的orchestration重建为graph workflow引擎。5层(Connector→Kernel→Agent→Orchestration→Interop)。75K+ GitHub stars汇入。
 
-**适用**: .NET/Azure栈；企业级需LTS保证
+**关键新功能**:
+- **DevUI**: `agent-framework devui` 启动浏览器本地debugger，实时可视化agent执行/消息流/工具调用/编排决策（本地用；生产用OpenTelemetry→APM）
+- **HarnessAgent**: Python SDK (2026-05)，专为长时多步自主任务设计的opinionated agent，含web search支持
+- **Declarative YAML**: agents和workflows可定义为version-controlled YAML，一行API调用加载运行
+- **Go SDK**: `microsoft/agent-framework-go` 独立仓库，渐进式tutorial（hello world→workflows）
+- **AG-UI**: 实时多Agent UI协议，与A2A/MCP并列的第三interop协议
+- **Checkpoint/Hydration**: workflow可checkpoint暂停后resume，长时任务不怕中断
+- **GitHub Copilot SDK集成**: 可将Copilot SDK client包装为first-class MAF agent
+
+**Provider**: Azure OpenAI / OpenAI / Anthropic Claude / Amazon Bedrock / Google Gemini / Ollama，一行切换
+
+**适用**: .NET/C#必须；Azure AI Foundry栈；企业级需LTS保证
 
 ### Pydantic AI — 类型安全优先 (工程品质)
 
