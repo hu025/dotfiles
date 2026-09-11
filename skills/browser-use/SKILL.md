@@ -3,16 +3,15 @@ name: browser-use
 description: AI浏览器自动化：browser-use库控制真实浏览器完成网页任务，支持多LLM(MiniMax/Claude/GPT)，MIT开源，113K stars，CLI 3.0 + Rust后端
 ---
 
-# browser-use 浏览器自动化技能（v0.13.10 · 2026-09）
+# browser-use 浏览器自动化技能（v0.13.10+ · 2026-09）
 
 ## 核心数据
 - **GitHub**: github.com/browser-use/browser-use
-- **stars**: 113K+（2026-09）
+- **stars**: 106K+（2026-09）
 - **License**: MIT
 - **Python**: >= 3.11（推荐 3.12）
-- **当前版本**: v0.14+（2026-09）
-- **Stars**: 113k（2026-09）
-- **架构**: 已从 Playwright 切换到纯 CDP（Rust Browser Harness）
+- **当前版本**: v0.13.10+（2026-09）
+- **架构**: Python API → Rust core → CDP Browser Harness
 
 ## 安装
 ```bash
@@ -184,12 +183,43 @@ V4 agent 支持定时任务（pause/resume），可自动化周期性工作。
 - Free tier 含 scheduled tasks（1小时最小间隔）
 - BYOK 缓存读取按折扣价（非全价）
 
+## 新增发现（2026-09 更新）
+
+### 1. v0.13 Rust Core Beta Agent
+Browser Use 0.13 引入全新 Rust 后端 beta agent，架构：
+```
+Python API → Rust core → Browser Harness → Web task done
+```
+- `from browser_use.beta import Agent`（新 beta agent）
+- `from browser_use import Agent`（旧版 Python agent，保留不变）
+- 适配当前前沿模型，提供更直接的浏览器控制循环
+
+### 2. BU 3.0 基准测试（2026-09）
+- BU 3.0 在 100 个真实浏览器任务上达到 **SOTA**：
+  - **WebVoyager**: 89.1% 成功率
+  - **Browser Use 内部 benchmark**: 对标主要竞品
+- 基准测试完全开源：github.com/browser-use/benchmark（131 stars）
+
+### 3. Stealth Browser Infrastructure（2026 新增）
+内置反反爬能力：
+- Cloudflare / DataDome / PerimeterX 等反Bot保护自动绕过
+- 真实浏览器指纹（TLSJA3/4、HTTP/2）
+- CAPTCHA 处理（Cloudflare Turnstile）
+- Proxy 轮换支持 195+ 国家
+- 免费加入：$0.02/browser-hour 起
+
+### 4. 性能突破（20 steps/minute）
+- 自研 LLM Gateway 降低 6x 延迟
+- BU 2.0：+12% 准确率，同等速度
+- BU 3.0（最新）：精度再提升
+
 ## 新模型支持（2026）
 - Grok 4.5 (xAI)
 - Kimi K3 (MoMoonshot)
 - Claude Fable 5
 - GLM / MiniMax 原生支持
 - bu-2-0-mini-preview
+- bu-3-max（最新旗舰）
 
 ## 关键特性
 - Agent 循环：观察→推理→执行→评估
