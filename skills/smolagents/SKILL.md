@@ -1,128 +1,88 @@
 ---
 name: smolagents
-description: Hugging Face 轻量级 AI Agent 库 — ~1000行核心代码、CodeAgent 原生代码执行、多模型支持、沙箱隔离执行。触发词：smolagents、轻量 agent、Hugging Face agent
+description: HuggingFace轻量Agent框架，CodeAgent代码优先，~1000行核心代码，MCP/LangChain工具集成。触发词：轻量agent/CodeAgent/代码执行agent
+triggers:
+  - 轻量agent框架
+  - CodeAgent
+  - HuggingFace agent
+  - 代码执行agent
+  - smolagents
 ---
 
-# smolagents — Hugging Face 轻量级 Agent 库
+# smolagents — HuggingFace 轻量级Agent框架
 
 ## 核心定位
+- **代码优先Agent**: CodeAgent用Python代码作为action，而非JSON tool calls
+- **极简主义**: 核心逻辑~1000行代码（agents.py），抽象最少化
+- **Model/Tool/Modality agnostic**: 任何LLM、任何工具、文本/视觉/音频/视频输入
+- **GitHub**: 27,700+ stars，2025年1月发布
 
-- **定位**：极简 Agent 框架，核心逻辑 ~1000 行代码（agents.py）
-- **Stars**：29.3k（2026-09，Apache-2.0）
-- **关键差异**：CodeAgent 原生用代码作为 action，而非生成 JSON/文本 tool call
+## 两种Agent类型
 
-## 核心能力
-
-### Agent 类型
-
+### CodeAgent（主力）
 ```python
-# CodeAgent — 原生代码执行（推荐）
 from smolagents import CodeAgent, InferenceClientModel
-agent = CodeAgent(tools=[], model=InferenceClientModel(model_id="mistralai/Mistral-3-70B"))
-result = agent.run("Calculate sum 1 to 100")
+
+model = InferenceClientModel()  # 默认HF推理API
+agent = CodeAgent(tools=[], model=model)
+result = agent.run("Calculate sum of 1 to 10")
+```
+LLM生成Python代码并在sandboxed环境执行，每个推理步骤产出一个可执行代码块。
+
+### ToolCallingAgent
+传统JSON/text工具调用，适合需要标准tool-use范式的场景。
+
+## 工具集成（核心差异化）
+
+### MCP服务器工具
+```python
+from smolagents import ToolCollection, CodeAgent
+
+# 从MCP服务器加载工具
+mcp_tools = ToolCollection.from_mcp("npx", "-y", "@modelcontextprotocol/server-filesystem")
+agent = CodeAgent(tools=mcp_tools)
 ```
 
-### ToolCallingAgent — JSON tool call（传统）
-
+### LangChain工具
 ```python
-from smolagents import ToolCallingAgent
-# 适合不需要代码执行的场景
-```
-
-### 多 Agent 协作
-
-```python
-# managed_agents — 主 agent 调用子 agent
-from smolagents import CodeAgent
-sub_agent = CodeAgent(tools=[...], model=model, name="researcher")
-main_agent = CodeAgent(tools=[], model=model, managed_agents=[sub_agent])
-```
-
-### 沙箱执行
-
-```python
-# 安全执行不可信代码
-from smolagents import CodeAgent, E2BExecutor
-agent = CodeAgent(tools=[], model=model, executor=E2BExecutor())
-# 支持: E2B / Modal / Docker / Blaxel
-```
-
-## 模型支持
-
-```python
-# HuggingFace Inference API（默认）
-from smolagents import InferenceClientModel
-model = InferenceClientModel(model_id="mistralai/Mistral-3-70B")
-
-# LiteLLM（100+ 模型：OpenAI/Anthropic等）
-from smolagents import LiteLLMModel
-model = LiteLLMModel(model_id="anthropic/claude-sonnet-4")
-
-# 本地模型（Transformers/Ollama）
-from smolagents import TransformersModel
-model = TransformersModel(model_id="meta-llama/Llama-3-8B")
-```
-
-## 工具集成
-
-```python
-# MCP 服务器
-from smolagents import ToolCollection
-tools = ToolCollection.from_mcp("path/to/mcp_server.py")
-
-# Hub Space 作为工具
+from langchain.tools import WikipediaQueryRun
 from smolagents import Tool
-tool = Tool.from_space("m-ric/text-to-image")
 
-# LangChain 工具
-tool = Tool.from_langchain(langchain_tool)
+wiki_tool = Tool.from_langchain(WikipediaQueryRun())
+agent = CodeAgent(tools=[wiki_tool])
 ```
 
-## 核心特性
-
-| 特性 | 说明 |
-|------|------|
-| **极简** | 核心 agents.py ~1000 行，无过度抽象 |
-| **CodeAgent** | action 直接生成 Python 代码执行，而非 JSON tool call |
-| **多模态** | 支持 text/vision/video/audio 输入 |
-| **Hub 集成** | `agent.from_hub()` 加载预训练 agent |
-| **沙箱** | E2B/Modal/Docker/Blaxel 隔离执行 |
-| **planning_interval** | 定期 planning step（无工具调用，反思+规划）|
-| **CLI** | `smolagent` / `webagent` 命令行工具 |
-
-## 实用配置
-
+### Hub Space作为工具
 ```python
-# 定期 planning（每 N 步反思一次）
-agent = CodeAgent(tools=[], model=model, planning_interval=3)
+from smolagents import Tool
 
-# 自定义指令
-agent = CodeAgent(tools=[], model=model, instructions="Always think step by step")
-
-# 多媒体输入
-agent.run("分析这张图", additional_args={"image": "path/to/image.jpg"})
+image_gen = Tool.from_space("black-forest-labs/FLUX.1-dev")
 ```
+
+## CLI使用
+```bash
+smolagent                    # 运行多步CodeAgent
+webagent                     # 网页Agent
+```
+
+## 与现有技能差异化
+- **vs Haystack**: smolagents更轻量（1000行 vs Haystack的完整RAG管道）
+- **vs LangChain/AutoGen**: smolagents没有复杂的编排图，代码即action
+- **适合Hermes场景**: 代码执行能力可用于复杂自动化脚本
 
 ## 安装
-
 ```bash
-pip install 'smolagents[toolkit]'  # 含默认工具
-pip install 'smolagents[litellm]'  # OpenAI/Anthropic
-pip install 'smolagents[transformers]'  # 本地模型
+pip install smolagents
+pip install "smolagents[litellm]"   # 支持OpenAI/Anthropic
+pip install "smolagents[transformers]"  # 本地模型
 ```
 
-## vs 其他框架
+## 关键特点
+1. **代码优先**: Agent不是"用来写代码"，而是"用代码思考"
+2. **Hub集成**: 工具和Agent可直接从HF Hub共享/拉取
+3. **多模态**: 内置支持文本、图像、视频、音频输入
+4. **MCP原生**: 官方支持Model Context Protocol工具
 
-| 维度 | smolagents | Mastra | AutoGen |
-|------|-----------|--------|---------|
-| 代码量 | ~1000 行 | 中等 | 较大 |
-| Agent 类型 | CodeAgent 优先 | 混合 | 混合 |
-| 多 agent | ✅ managed_agents | ✅ Harness | ✅ 强 |
-| 沙箱 | E2B/Modal/Docker | 无 | 无 |
-| 重点 | 极简+安全执行 | TS/观测性 | 成熟度 |
-
-## 来源
-
-- GitHub: https://github.com/huggingface/smolagents
-- Docs: https://huggingface.co/docs/smolagents/index
-- v1.26.0（2026-05，dev: v1.27.0）
+## 参考
+- https://github.com/huggingface/smolagents
+- https://huggingface.co/docs/smolagents/en/index
