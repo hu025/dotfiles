@@ -19,7 +19,12 @@ Mastra 是 TypeScript 原生的 AI 应用 + agent 框架（Apache 2.0 核心）�
 
 ## 核心创新
 
-### 1. Mastra Harness — 交互式 Agent 循环
+### 1. Mastra v1.0 GA（2026-01 里程碑）
+- **生产用户**：Replit、PayPal、Sanity、SoftBank、Brex
+- **资金**：$13M seed（Y Combinator W25，Paul Graham 投资）
+- **npm**：300K+ 每周下载，21K+ GitHub stars
+
+### 2. Mastra Harness — 交互式 Agent 循环
 
 Harness 是 agent 循环的外层封装：
 

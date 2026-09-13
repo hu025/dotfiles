@@ -34,9 +34,38 @@ updated: 2026-09-10
 - 自定义扩展
 
 ### 协议支持
-- **MCP**（Model Context Protocol）— 工具集成
-- **A2A**（Agent-to-Agent）— agent 间通信
-- **OAP**（Open Agent Protocol）— 新兴 agent 间互操作标准
+- **MCP**（Model Context Protocol）— 工具集成（原生支持）
+- **A2A**（Agent-to-Agent）— agent 间通信（原生支持，唯一同时支持 MCP+A2A 的框架）
+- **19+ transport bindings**：HTTP / WebSocket / gRPC / SSE / stdio / A2A / MCP
+
+### AgentID 身份系统（2026-02 新增）
+- W3C DID 支持 + challenge-response 认证 + JWT token
+- 为每个 agent 提供可验证的加密身份
+
+### OpenAgents Workspace（浏览器协作环境）
+- 人类与 AI agents 在共享线程中实时协作
+- 支持文件共享 + live browser
+- 适合 human-in-the-loop 审批流
+
+### OpenAgents Launcher（桌面应用/CLI）
+- 一键安装 + 管理 10+ coding agents：
+  - OpenClaw ✅（任何 LLM 后端）
+  - Claude Code ✅（Anthropic）
+  - Codex CLI ✅（OpenAI）
+  - Hermes Agent ✅（Nous）
+  - Cursor ✅、OpenCode ✅、GitHub Copilot CLI ✅、Gemini CLI ✅
+  - Cline 🧪、Aider 🧪、DeepSeek Harness 🧪、Goose 🧪
+- 跨平台（macOS / Linux / Windows）
+- 后台守护进程运行
+
+### A2A vs OpenAgents Network Model 区别
+| 维度 | A2A Protocol | OpenAgents Network Model |
+|------|--------------|------------------------|
+| 拓扑 | 点对点（client → server） | 多对多（网络内） |
+| 核心抽象 | 带生命周期状态的 Task | 网络中流动的 Events |
+| 通信模式 | 请求-响应 | 持续事件流 |
+| 共享资源 | 不支持（由 MCP 补充） | 原生支持（工具/文件/context + 权限模型） |
+| 适用场景 | 外部互操作 | 内部 agent 网络架构 |
 
 ### Python SDK
 ```python

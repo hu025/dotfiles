@@ -36,6 +36,19 @@ description: 多Agent编排模式：fan-out/pipeline/debate/supervisor/swarm五�
 - **失败模式**: context-drift（agent 重复工作）
 - **仅当**: 任务数 > 50 且运行时增长
 
+### 6. **Conversational** (AutoGen / Microsoft Agent Framework)
+- agents 通过结构化对话协作，AI 自身决定下一个 speaker
+- **Group Chat Manager**: 另一个 AI agent 决定谁在什么时刻发言
+- **适用**: 代码生成+review、辩论、研究多专家会诊
+- **成本**: ~2.5x 单 agent（非确定性对话可能消耗更多 token）
+- **注意**: AutoGen 已进入维护模式（2026-04），新项目用 Microsoft Agent Framework 1.0
+
+### 7. **Typed Handoff** (Mastra / Pydantic AI)
+- TypeScript 类型系统跨 agent 边界流动，确保 handoff 时数据 schema 不丢失
+- Mastra: `.network()` + LLM router 动态决定哪个 agent 处理输入
+- Pydantic AI: `result_type` Pydantic 模型保证输出结构
+- **适用**: TypeScript 生产系统、需要编译时类型安全的 Python 系统
+
 ## 决策矩阵
 
 | 情况 | 模式 | 工具 |
@@ -45,6 +58,8 @@ description: 多Agent编排模式：fan-out/pipeline/debate/supervisor/swarm五�
 | 两个方案需裁决 | Debate | Subagents + judge |
 | 已知任务树+专业化 | Supervisor | Subagents with agentType |
 | 未知任务列表+运行时增长 | Swarm | Agent Teams |
+| agents 需要讨论/辩论/迭代改进 | Conversational | AutoGen / MAF |
+| TypeScript 生产系统需类型安全 | Typed Handoff | Mastra / Pydantic AI |
 
 ## 跨模式通用规则
 
