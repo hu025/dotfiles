@@ -133,9 +133,24 @@ Mcp-Name: search
 
 ## 六、生态落地
 
-### 6.1 SDK 全面支持
-- **TypeScript、Python、Go、C#** 四大 Tier-1 SDK 全部支持 2026-07-28
-- **FastMCP 4.0**：背景任务、无状态交互、企业认证全面支持
+### 6.1 SDK 全面支持（2026-07-28 正式发布）
+- **Python SDK v2.0.0 正式发布**（2026-07-28）：`pip install mcp` 现默认安装 2.x
+  - `FastMCP` 重命名为 `MCPServer`（装饰器 API 不变）
+  - 新增 `Client` 类替代 v1 的 transport+`ClientSession`+`initialize()` 分层
+  - MRTR 支持：`Resolve(fn)` 参数注入，工具体内可向用户提问，无需保持连接
+  - `mcp-types` 独立包发布（`import mcp_types`）
+  - OpenTelemetry tracing 默认开启
+  - stdio 服务端硬化：subprocess 和 stray prints 隔离
+  - OAuth 新增 RFC 9207 issuer 校验、SEP-990 identity-assertion flow、client-credentials extension
+  - **Tasks 扩展未包含在此版本**（SEP-2663 待后续 2.x）
+  - **v1.x 进入维护模式**：仅接收安全补丁，不迁移则需保留 `<2` 上限
+- **TypeScript SDK v2**：拆分为 `@modelcontextprotocol/server`、`@modelcontextprotocol/client` 等专注包（ESM-only，Node 20+/Bun/Deno）
+  - 工具 schema 现支持 Zod v4、Valibot、ArkType（Standard Schema）
+  - `createMcpHandler` 支持 2026-07-28，Express/Hono/Fastify 适配器
+  - v1 到 v2 有 codemod：`npx @modelcontextprotocol/codemod@beta v1-to-v2 .`
+- **Go SDK v1.7.0**：支持 2026-07-28，Streamable HTTP 可选 stateless 模式
+- **C# SDK 2.0.0-preview**：稳定 v1.x API 继续工作，弃用特性标记 `[Obsolete]`
+- **Rust SDK**：beta 阶段支持新 spec
 - GitHub MCP Server 已完全移除 Redis session 存储
 - Cloudflare Workers / AWS Lambda / Cloudflare R2 等 serverless 成为一等公民
 
@@ -170,11 +185,14 @@ Mcp-Name: search
 - **多协议绑定**：HTTP+JSON、JSON-RPC 2.0、gRPC，带正式等价保证
 - **签名 Agent Cards**：密码学验证 agent 身份
 - **游标分页**：替换 offset-based 分页
+- **Cloud Run 原生支持**：Google Cloud Run 支持 A2A Agent 部署，`Vertex AI Agent Engine` 内置 A2A 支持
+- **生态系统**：LangGraph / CrewAI / Pydantic AI / AG2 / IBM BeeAI / Semantic Kernel 均已支持 A2A
 
 ### 7.3 Agentic AI Foundation（AAIF）合并
-- **2026年8月17日**：A2A 从 Linux Foundation 整体迁入 AAIF
-- AAIF 已托管：MCP（Athropic）+ A2A（Google）+ goose（Block）+ AGENTS.md（OpenAI）+ agentgateway
+- **2026年8月27日**：A2A 从 Linux Foundation 整体迁入 **Agentic AI Foundation**（Growth Stage）
+- AAIF 已托管：MCP（Anthropic）+ A2A（Google）+ goose（Block）+ AGENTS.md（OpenAI）+ agentgateway
 - 一个基金会统一管理"如何让 agent 用工具"和"agent 之间如何对话"
+- **生态规模**：150+ 组织生产部署，跨越供应链/金融服务/移动平台；ServiceNow/Salesforce/Atlassian/SAP 均已集成
 
 ### 7.4 完整协议栈心智模型
 ```
@@ -203,11 +221,13 @@ agentgateway →  边界处理路由、认证授权、限流遥测
 |------|------|
 | MCP 2026-07-28 官方博客 | https://blog.modelcontextprotocol.io/posts/2026-07-28/ |
 | MCP RC 博客 | https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate/ |
+| MCP Python SDK v2.0.0 发布 | https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.0.0 |
+| MCP 2026-07-28 深度解析 | https://mapell.dev/articles/mcp-2026-07-28-is-final |
+| MCP 2026-07-28 安全分析 | https://www.akamai.com/blog/security-research/new-mcp-specification-security-teams-must-prepare |
 | Google Cloud: MCP 无状态扩展 | https://developers.googleblog.com/scaling-ai-agent-infrastructure-with-the-mcp-stateless-updates/ |
 | AWS: MCP Well-Architected | https://aws.amazon.com/blogs/architecture/mcp-went-stateless-is-your-aws-mcp-server-deployment-well-architected/ |
-| Cloudflare: MCP v2 | https://blog.cloudflare.com/mcp-v2/ |
-| MCP 官方路线图 | https://blog.modelcontextprotocol.io/posts/mcp-roadmap/ |
-| AAIF 合并 MCP+A2A | https://rodtrent.substack.com/p/mcp-and-a2a-under-one-roof |
-| A2A 加入 AAIF | https://ai2.work/blog/google-s-a2a-protocol-joins-the-agentic-ai-foundation-with-mcp |
-| A2A v1.0 深度解析 | https://codex.danielvaughan.com/2026/04/09/a2a-meets-mcp-protocol-stack |
+| A2A 加入 AAIF（2026-08-27） | https://a2a-protocol.org/latest/blog/2026/08/27/a-new-chapter-for-a2a-joining-the-agentic-ai-foundation/ |
+| A2A v1.0 发布 | https://a2a-protocol.org/latest/blog/2026/03/12/a2a-protocol-ships-v10-production-ready-standard-for-agent-to-agent-communication/ |
+| A2A Cloud Run 部署 | https://docs.cloud.google.com/run/docs/ai/a2a-agents |
+| A2A 官方协议栈 | https://a2a-protocol.org/latest/ |
 | MCP 架构文档 | https://modelcontextprotocol.io/docs/2026%2D07%2D28/learn/architecture |
