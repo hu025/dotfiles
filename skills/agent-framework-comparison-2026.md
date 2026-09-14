@@ -65,14 +65,45 @@ category: agent-engineering
 
 **架构**: Semantic Kernel作foundation层，AutoGen的orchestration重建为graph workflow引擎。5层(Connector→Kernel→Agent→Orchestration→Interop)。75K+ GitHub stars汇入。
 
-**关键新功能**:
-- **DevUI**: `agent-framework devui` 启动浏览器本地debugger，实时可视化agent执行/消息流/工具调用/编排决策（本地用；生产用OpenTelemetry→APM）
-- **HarnessAgent**: Python SDK (2026-05)，专为长时多步自主任务设计的opinionated agent，含web search支持
-- **Declarative YAML**: agents和workflows可定义为version-controlled YAML，一行API调用加载运行
-- **Go SDK**: `microsoft/agent-framework-go` 独立仓库，渐进式tutorial（hello world→workflows）
+**关键新功能 (2026-04 GA)**:
+- **DevUI**: `agent-framework devui` 启动浏览器本地debugger，实时可视化agent执行/消息流/工具调用/编排决策
+- **HarnessAgent**: Python SDK (2026-05)，专为长时多步自主任务，含web search支持
+- **Declarative YAML**: agents和workflows可定义为version-controlled YAML
+- **Go SDK**: `microsoft/agent-framework-go` 独立仓库
 - **AG-UI**: 实时多Agent UI协议，与A2A/MCP并列的第三interop协议
-- **Checkpoint/Hydration**: workflow可checkpoint暂停后resume，长时任务不怕中断
-- **GitHub Copilot SDK集成**: 可将Copilot SDK client包装为first-class MAF agent
+- **Checkpoint/Hydration**: workflow可checkpoint暂停后resume
+- **GitHub Copilot SDK + Claude Code SDK集成**: 两者均可包装为first-class MAF agent
+- **Agent Skills (2026-09 Preview)**: 技能包格式 `SKILL.md` 与 Hermes 技能格式**完全一致**（见下方详情）
+- **Foundry Hosted Agents (Preview)**: 2行代码部署到 Foundry 托管基础设施
+- **AF Labs (Preview)**: 实验包，含 benchmark/RL/research 模块
+
+### MAF Agent Skills — SKILL.md 格式（与 Hermes 技能对齐）
+
+MAF Agent Skills 采用与 Hermes 完全相同的 `SKILL.md` 格式：
+
+```yaml
+---
+name: expense-report
+description: File and validate employee expense reports...
+license: Apache-2.0
+compatibility: Requires python3
+metadata:
+  author: contoso-finance
+  version: "2.1"
+---
+
+# 技能说明（step-by-step guidance, examples, edge cases）
+```
+
+**目录结构**：`SKILL.md` + `scripts/` + `references/` + `assets/`
+
+**渐进披露（4阶段）**：
+1. Advertise（~100 token/skill）— 只加载 name + description
+2. Disclose — 加载 SKILL.md body
+3. Elaborate — 按需加载 references/
+4. Deep-dive — 按需加载 assets/
+
+这与 Hermes 的技能触发机制高度一致，**证明 Hermes 技能格式已是行业标准**。
 
 **Provider**: Azure OpenAI / OpenAI / Anthropic Claude / Amazon Bedrock / Google Gemini / Ollama，一行切换
 
