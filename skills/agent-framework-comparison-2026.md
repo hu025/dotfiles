@@ -27,6 +27,7 @@ category: agent-engineering
 | **OpenAI Agents SDK** | ≥0.14.0 (2026-04) | OpenAI | native | roadmap | GA v0.x |
 | **Claude Agent SDK** | TS 0.2.x / Py 0.1.34 | Anthropic | native | — | GA lib |
 | **TrueForge** | 2026-08 | TrueFoundry | native | — | GA (new) |
+| **bu-agent-sdk** | 0.1.0 (2026-01) | Browser Use | — | — | GA (685+ stars) |
 | **deepagents** | 2026-04 | LangChain Inc. | adapter | — | GA |
 
 ## 生产部署份额 (2026 Q1 估计)
@@ -141,6 +142,18 @@ async def get_db_conn(ctx: RunContext) -> DBConnection:
 **劣势**: TypeScript 生态（与 Hermes Python 不同）；2026-08 新发布，生产案例少
 
 **适用**: 需要 SKILL.md 技能包机制的 TypeScript Agent 项目；需要沙箱隔离的代码执行场景
+
+### bu-agent-sdk — 极简 Agent 框架 (2026-01, new)
+
+**定位**: "An agent is just a for-loop." — 最小化抽象哲学，MAF SKILL.md + 完整 action space 即核心。
+
+**优势**: ~300行/provider；Done Tool Pattern（TaskComplete异常强制显式完成）；Ephemeral Messages保护上下文；Dependency Injection(FastAPI风格)；Streaming Events
+
+**劣势**: 仅685 stars（远小于browser-use 110k）；仅Python；生产案例少
+
+**Philosophy — The Bitter Lesson**: "All the value is in the RL'd model, not your 10,000 lines of abstractions." 模型RL后能力已足够，框架只需提供完整action space + for-loop + 显式退出。
+
+**适用**: browser-use生态内的轻量agent开发；需要最小化框架的场景
 
 ### deepagents — LangChain 全功能 Harness (2026-04)
 
