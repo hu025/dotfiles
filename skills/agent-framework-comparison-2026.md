@@ -26,6 +26,8 @@ category: agent-engineering
 | **Pydantic AI** | 1.95.0 (2026-05-13) | Pydantic Inc. | native | native | GA |
 | **OpenAI Agents SDK** | ≥0.14.0 (2026-04) | OpenAI | native | roadmap | GA v0.x |
 | **Claude Agent SDK** | TS 0.2.x / Py 0.1.34 | Anthropic | native | — | GA lib |
+| **TrueForge** | 2026-08 | TrueFoundry | native | — | GA (new) |
+| **deepagents** | 2026-04 | LangChain Inc. | adapter | — | GA |
 
 ## 生产部署份额 (2026 Q1 估计)
 
@@ -99,6 +101,26 @@ async def get_db_conn(ctx: RunContext) -> DBConnection:
     return await ctx.deps  # 类型安全的依赖注入
 ```
 
+### TrueForge — 开源 Agent Harness (2026-08, new)
+
+**定位**: 将 LLM 转化为可工作 Agent 的**运行时层**，声称比 Claude Managed Agents 成本低 50%（同精度）。
+
+**优势**: SKILL.md 技能包（与 Hermes 技能格式同源）；沙箱隔离（Daytona）；人工审批 Checkpoints；上下文压缩；TypeScript/Node.js，Local(SQLite) 或 Hosted(Postgres+Redis) 模式
+
+**劣势**: TypeScript 生态（与 Hermes Python 不同）；2026-08 新发布，生产案例少
+
+**适用**: 需要 SKILL.md 技能包机制的 TypeScript Agent 项目；需要沙箱隔离的代码执行场景
+
+### deepagents — LangChain 全功能 Harness (2026-04)
+
+**定位**: LangChain 的 batteries-included agent harness，基于 LangGraph，29k ⭐。
+
+**优势**: 开箱即用（planning/filesystem/subagents/上下文管理）；Model-agnostic；LangSmith 原生集成；Deep Agents Code（终端编码 Agent）；支持任何 LLM
+
+**劣势**: 依赖 LangChain/LangGraph 生态；比轻量 harness 重
+
+**适用**: 已在 LangChain 栈的团队；需要开箱即用 Agent 的场景
+
 ### A2A 协议 (Agent to Agent, GA 2026-04-09)
 
 - Linux Foundation Agentic AI Foundation 主持
@@ -125,6 +147,7 @@ async def get_db_conn(ctx: RunContext) -> DBConnection:
     ├─ 类型安全 + 工程 discipline → Pydantic AI
     │
     └─ 低代码 / DACH主权 / n8n (柏林) → n8n
+    └─ TypeScript / SKILL.md 技能包 / 沙箱隔离 → TrueForge
 ```
 
 ## 关键洞察
