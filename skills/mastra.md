@@ -15,14 +15,15 @@ category: agent-engineering
 
 Mastra 是 TypeScript 原生的 AI 应用 + agent 框架（Apache 2.0 核心），由 Gatsby 团队构建。
 
-**数据**: ~23K GitHub stars，~300K+ 每周 npm 下载（2026 Q2）
+**数据**: ~26.2K GitHub stars，~300K+ 每周 npm 下载（2026-07）
 
 ## 核心创新
 
 ### 1. Mastra v1.0 GA（2026-01 里程碑）
-- **生产用户**：Replit、PayPal、Sanity、SoftBank、Brex
-- **资金**：$13M seed（Y Combinator W25，Paul Graham 投资）
-- **npm**：300K+ 每周下载，21K+ GitHub stars
+- **生产用户**：Replit（96%任务成功率）、PayPal、Sanity、SoftBank、Brex、Marsh McLennan
+- **资金**：$13M seed（Y Combinator W25）→ $22M Series A（2026-04），累计 $35M
+- **最新版本**：@mastra/core **1.51.0**（2026-07-15）
+- **npm**：300K+ 每周下载，26.2K GitHub stars
 
 ### 2. Mastra Harness — 交互式 Agent 循环
 
@@ -79,13 +80,56 @@ Date: 2026-01-15
 const agent = new Agent({ model: "openai/gpt-4o" });
 ```
 
-### 4. 工作流引擎 + MCP
+### 4. 工作流引擎 + foreach
 
 ```typescript
 pipe.then().branch().parallel()  // 顺序/分支/并行
-// Human-in-the-loop: workflow.suspend() 等待批准
-// MCP server 创作：暴露 agents/tools 为 MCP 接口
+// foreach: 并发循环执行数组每个元素，concurrency 控制并行数
+workflow.foreach(step1, { concurrency: 2 })
+// next step 等所有 batch 完成才执行，不管 concurrency 设置
+// 每个 item 需要多步用 nested workflow 作为 step
 ```
+
+### 5. Evals — Scorers 系统（v1 迁移后）
+
+```typescript
+// 新 API（v1）：runExperiment → runEvals
+import { createScorer, runEvals } from '@mastra/core/evals';
+
+// 内置 scorers（@mastra/evals/scorers/prebuilt）
+import { createHallucinationScorer, createFaithfulnessScorer } from '@mastra/evals/scorers/prebuilt';
+
+// 自定义 code-based scorer
+import { createContentSimilarityScorer, createCompletenessScorer } from '@mastra/evals/scorers/prebuilt';
+
+const result = await runEvals({
+  target: myAgent,
+  scorers: [scorer],
+  data: inputs
+});
+```
+
+### 6. Server Adapters — 任意 HTTP 框架集成
+
+```typescript
+// 支持：@mastra/express / @mastra/hono / @mastra/fastify / @mastra/koa / @mastra/elysia / @mastra/nestjs
+import express from 'express'
+import { MastraServer } from '@mastra/express'
+import { mastra } from './mastra'
+
+const app = express()
+app.use(express.json())
+const server = new MastraServer({ app, mastra, prefix: '/api/v2' })
+await server.init()
+app.listen(4111, () => console.log('Server running on port 4111'))
+```
+
+### 7. Mastra Studio — 调试重放
+
+- replay 任意 agent run
+- 检查每个 tool call
+- 审查 token 使用量
+- 启动：`mastra studio`（独立 UI 进程）
 
 ## 关键对比
 
@@ -108,9 +152,11 @@ cd my-agent && npx bgproc start -n my-agent -w -- npm run dev
 
 ## 新发现落地
 
-- **Harness 模式**: 适合 Hermes 未来实现"人类监督的长时间自主 agent"
-- **Observational Memory**: 三时间戳+emoji 格式可迁移到 Hermes 记忆系统
-- **TypeScript 生态**: Hermes 技能库首个 TS 框架
+- **foreach 并发循环**: 可用于 Hermès 多任务并行执行（替代顺序循环）
+- **Server Adapters**: 暴露 agents/tools 为 Express/Hono/Fastify 等 HTTP 端点 → Hermès 可借鉴将 cron/skills 暴露为 REST API
+- **Evals/Scorers 系统**: 内置 faithfulness/hallucination/completeness scorer → Hermès 技能质量评估可复用
+- **Observational Memory**: 三时间戳+emoji 格式已记录（上次）
+- **Mastra Studio**: 调试重放 + token 审查 → Hermès 日志系统可借鉴
 
 ## 来源
 
