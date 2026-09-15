@@ -37,15 +37,19 @@ updated: 2026-09-13
 - 核心发现：长上下文模型在长对话中仍显著衰退
 - 论文：https://github.com/mohammadtavakoli78/BEAM
 
-## 记忆架构分类（2026）
-
 ### 记忆API层
 - **Mem0**：管理型长期记忆+个性化，多跳推理+29.6分，时序推理+23.1分
   - 新算法：单次ADD-only提取（Agent生成事实与用户陈述同等权重）+多信号检索（语义+关键词+实体三路并行）
   - 对比：LoCoMo 92.5 vs Zep 80.32 vs Letta 74.0
-- **Supermemory**：用户上下文学习+RAG，图记忆+用户画像
+- **Supermemory**（29.7k stars）：用户上下文学习+RAG，图记忆+用户画像，Cloudflare Workers+Durable Objects+PostgreSQL+KV，~50ms用户画像检索，自动遗忘+矛盾检测，pip install supermemory可用。自报三大基准第一（独立验证缺失）。
 - **Membase**：记忆为episode，实体提取，知识图链接
 - **Memory Store**：跨AI工具通用记忆
+
+### 无服务器/嵌入式专用
+- **Memvid**（16.5k stars，Apache 2.0）：单文件`.mv2`记忆，Rust核心，无数据库无服务器，append-only Smart Frames，子5ms检索，时间旅行调试（回滚/重放/分支任意记忆状态），frame级ACL。可作为Hermes便携记忆层的离线替代方案。
+  - GitHub: https://github.com/memvid/memvid
+  - `memvid/claude-brain`：给Claude Code零数据库记忆，一个`.mv2`文件替代ChromaDB/SQLite
+  - 适用：边缘/离线/便携Agent、跨session记忆共享、git式记忆管理
 
 ### 时序知识图谱层
 - **Zep**：时序知识图+实体+关系+事实+episode+有效期
@@ -68,7 +72,8 @@ updated: 2026-09-13
 - **Kumiho**：图原生溯源
 - **Memora**：轻量级
 - **Redis Agent Memory**：工作内存(Redis内存)+长期内存(Redis向量搜索)
-- **mem0-integration**（Hermes现有）：SQLite+TF-IDF轻量方案，官方Mem0为升级路径
+| **mem0-integration**（Hermes现有）：SQLite+TF-IDF轻量方案，官方Mem0为升级路径 |
+| **Memvid**（新增）：单文件`.mv2`便携记忆，Rust核心，无服务器。Hermes离线/便携记忆的首选方案，替代SQLite方案 |
 
 ## 关键新发现
 
