@@ -165,6 +165,27 @@ async def get_db_conn(ctx: RunContext) -> DBConnection:
 
 **适用**: 已在 LangChain 栈的团队；需要开箱即用 Agent 的场景
 
+### AutoGPT Platform — Visual Builder + Marketplace (187k ⭐, new)
+
+**定位**: 2023年最速破100k ⭐的项目重生为可视化低代码 Agent 平台；Dual License: Classic (MIT) + Platform (Polyform Shield License)。
+
+**优势**:
+- **AutoPilot**: 聊天式 Agent 生成（自然语言描述 → 自动组装 Agent）
+- **Visual Builder**: 拖拽式 Block 工作流编辑器，完全可视化
+- **Marketplace**: 预制 Agent 模板生态，降低从零构建门槛
+- **45+ 集成**: Gmail, Slack, GitHub, Notion, HubSpot, Linear, Salesforce 等
+- **自托管免费**: Docker Compose 一键部署，自带 API Key，免费使用全平台
+- **计划/触发执行**: 按时间表或事件触发运行，credit wallet 计费
+
+**劣势**:
+- Platform 产品 (Polyform Shield License) ≠ Classic (MIT) 开源版
+- 托管版无免费层（$42.50/mo Pro 起）
+- 与 Hermes 相比：Block Builder ≈ cron workflow，Marketplace ≈ skills ecosystem，但 Hermes 更灵活
+
+**行业模式 — AGENTS.md as Canonical**: AutoGPT 仓库将 `AGENTS.md` 作为 canonical 指令文件，`CLAUDE.md` 退化为 1 行 shim (`@AGENTS.md`)。此模式与 MAF、Claude Code 一致，**行业向统一指令格式收敛**。
+
+**适用**: 非技术用户需可视化构建重复性工作流；已有 45+ 集成的现成可用性优先场景
+
 ### A2A 协议 (Agent to Agent, GA 2026-04-09)
 
 - Linux Foundation Agentic AI Foundation 主持
