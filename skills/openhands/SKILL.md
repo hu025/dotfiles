@@ -20,7 +20,8 @@ OpenHands (formerly OpenDevin) by All-Hands-AI is the **top-performing open-sour
 
 Two key components in 2026:
 - **CodeAct agent**: The core agent — generates executable Python as actions (not JSON tool calls), runs in sandbox, observes output, iterates
-- **Agent Canvas**: Self-hosted browser-based control center with chat panel, file browser, live terminal, per-project token cost tracking
+- **Agent Canvas v1.14** (renamed from "Canvas"): "self-hosted developer control center" — browser UI with chat, file browser, live terminal; v1.14 stable release
+- **ACP (Agent Client Protocol)**: JSON-RPC over stdio standard for driving external coding agents — Claude Code, Codex, Gemini CLI all run under the same Canvas UI without context loss
 
 ## Core Capabilities
 
@@ -113,15 +114,19 @@ docker run -it --rm \
 
 Key: `SANDBOX_USER_ID=$(id -u)` ensures non-root execution (sandbox user matches host user permissions). `SANDBOX_VOLUMES` restricts which directories the sandbox can access.
 
-### Agent Canvas (Web UI)
+### Agent Canvas v1.14 (npm — Recommended)
 
 ```bash
-# Install and launch Canvas UI
-uv tool install openhands --python 3.12
-openhands serve          # GUI on http://localhost:3000
-openhands serve --gpu    # With GPU support
-openhands serve --mount-cwd  # Mount current directory
+# Install and launch in one shot
+npm install -g @openhands/agent-canvas
+agent-canvas                  # → http://localhost:8000
+
+# Split mode for custom deployments
+agent-canvas --frontend-only   # static frontend + ingress only
+agent-canvas --backend-only   # agent server + automation backend + ingress only
 ```
+
+> Agent Canvas v1.14 ships as `@openhands/agent-canvas` npm package (Node.js 22.12+). Docker still supported; split mode available for team setups.
 
 ### Python SDK
 
@@ -181,6 +186,27 @@ actions:
       3. Write a fix
       4. Open a PR
 ```
+
+## ACP (Agent Client Protocol)
+
+ACP is a **JSON-RPC over stdio** standard that lets Agent Canvas drive any ACP-compatible agent as a subprocess — Claude Code, Codex, Gemini CLI — without the Canvas needing to know anything about the LLM or tools. This turns Canvas into a true **agent aggregator**: one UI, all major coding agents, zero context fragmentation.
+
+```mermaid
+flowchart LR
+    canvas["Agent Canvas<br/>(UI)"] --> server["Agent Server"]
+    server --> acp["ACP subprocess<br/>(Claude Code / Codex / Gemini CLI)"]
+    acp --> llm["LLM provider<br/>(Anthropic / OpenAI / Google)"]
+```
+
+**Available ACP agents** (install via npx):
+
+| Provider | ACP command |
+|----------|-------------|
+| Claude Code | `npx -y @agentclientprotocol/claude-agent-acp` |
+| Codex | `npx -y @zed-industries/codex-acp` |
+| Gemini CLI | `npx -y @google/gemini-cli --acp` |
+
+> ACP agents reuse the provider's CLI login on the same machine — no API key needed locally. On cloud sandboxes, an API key is required.
 
 ## Comparison: OpenHands vs SWE-agent vs Aider
 
