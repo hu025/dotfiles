@@ -78,16 +78,54 @@ with tracer.start_as_current_span(
 
 | 工具 | 类型 | 开源 | 语言 | 特点 | 价格 |
 |------|------|------|------|------|------|
-| **Langfuse** | Tracing | ✅ MIT | Python/TS | 最广泛采用，OpenAI Agents SDK集成 | Self-host / $29/mo |
+| **Langfuse** | 平台 | ✅ MIT | Python/TS | 2026-01被ClickHouse收购，20k+ stars，23M/月SDK安装，OTel原生，ClickHouse后端 | Self-host(免费) / $29/mo |
+| **Comet Opik** ⭐ | 平台 | ✅ Apache 2.0 | 多语言 | **独立厂商(Comet)**，Agent Optimizer(7算法)，60+集成，MCP诊断服务器，Ollie自动修复 | Self-host(免费) / Cloud |
 | **Laminar** | Tracing | ✅ Apache 2.0 | Rust | 极速摄入，OTel原生，内容去重，存储省20% | Free / Cloud $$-$$$ |
 | **MLflow Tracing** | Tracing | ✅ Apache 2.0 | Python | GenAI语义约定原生，trace replay，prompt版本管理 | Free |
 | **Arize Phoenix** | Tracing | ✅ ELv2 | Python | OTel原生，4种agent评估器，MCP追踪 | Free / $50/mo |
 | **Weave (W&B)** | Tracing | ✅ Apache 2.0 | Python/TS | MCP自动日志，scorer系统 | $60/mo |
 | **LangSmith** | 平台 | ❌ | 多语言 | Insights Agent自动聚类生产trace | $139/mo起 |
 | **DeepEval** | 评估 | ✅ Apache 2.0 | Python | 6种agent指标，Pytest集成 | Free / $19.99/user/mo |
-| **Comet Opik** | 平台 | ✅ Apache 2.0 | 多语言 | 高吞吐trace摄入，生产级规模 | Free |
 | **Braintrust** | 评估 | ❌ | 多语言 | OpenAI Agents SDK + Google ADK集成 | $$-$$$ |
 | **Monte Carlo** | 平台 | ❌ | 多语言 | **唯一同时监控数据+AI栈**，端到端血缘 | 联系销售 |
+
+---
+
+## Comet Opik 深度（独立开源推荐）
+### 为什么 Opik 是更好的独立选择
+- **Apache 2.0 全面开源**：包括 Agent Optimizer SDK，无功能锁定
+- **独立厂商**：Comet（非基础设施商），无 vendor lock-in 风险
+- **60+ 框架集成**：OpenAI/LangChain/Anthropic/CrewAI/AutoGen/AG2/Google ADK
+- **Agent Optimizer**：7种优化算法，自动调优 system prompt / few-shot / LLM参数 / MCP schema
+- **Ollie**：in-product agent 读 trace → 提案代码修复 → 附回归测试；Enterprise 自托管
+- **MCP 诊断服务器**：coding agent 可直接查询 trace 分析结果
+
+### 快速部署
+```bash
+# 一键部署
+curl -s https://get.opik.io | bash
+
+# Docker 部署
+docker compose up -f docker-compose.yml
+```
+
+### Agent Optimizer 示例
+```python
+from opik import Opik
+from opik.plugins.agent_optimizer import AgentOptimizer
+
+opik = Opik()
+optimizer = AgentOptimizer(
+    project_name="my-agent",
+    algorithms=["prompt_tuning", "few_shot_selection", "tool_schema_opt"]
+)
+
+# 从已有 trace 自动优化
+optimizer.optimize_from_traces(
+    min_trace_count=100,
+    target_metric="task_completion"
+)
+```
 
 ---
 
@@ -133,6 +171,8 @@ span_processor = BatchSpanProcessor(exporter)
 ---
 
 ## Langfuse 集成（OpenAI Agents SDK）
+
+> ⚠️ **2026-01 重要变更**：Langfuse 已于 2026-01-16 被 ClickHouse 收购（$400M Series D）。MIT 许可证和自托管路径已承诺不变。但作为基础设施商拥有的追踪层，存在商业利益绑定的长期风险。建议新项目优先评估 Comet Opik（Apache 2.0，独立厂商）。
 
 ```python
 # Langfuse + OpenAI Agents SDK
