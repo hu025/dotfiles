@@ -42,6 +42,8 @@ category: agent-engineering
 - **Mods (Self-Modifying Harness Extensions)**: Agents can extend their own tool harness at runtime
 - **Subagents**: Hierarchical multi-agent with shared memory blocks
 - **Context Repositories**: Git-backed collaboration, multi-agent git sync
+- **Memory Agents & Swarms**: Concurrent subagent memory processing via git worktrees; memory initialization/reflection/defragmentation as dedicated subagent skills
+- **Skill Learning**: /skill command generates skills from trajectories + feedback; 36.8% relative improvement on Terminal Bench 2.0; skills stored as .md files in git
 - **Channels**: Native Slack/Telegram/Discord integrations via Letta Code
 - **Letta Evals**: Open-source evaluation framework for stateful agents (Context-Bench)
 - **Memory Omni-Tool (Sep 2025)**: Claude Sonnet 4.5 integration for enhanced memory
@@ -88,7 +90,9 @@ docker run -p 8282:8282 lettaai/letta:latest
 - Conversation forking with shared message history
 - Security: local filesystem access blocked via ImageContent bypass
 
-## Hermes Integration Points
+- **`/skill` command**: Skill Learning — generates skills from trajectories + verifier feedback; 36.8% relative improvement on Terminal Bench 2.0; fallback pattern for Hermes's own /skill system
+- **`/doctor` and `/palace`**: Memory quality audit and visualization; pattern for Hermes memory health checks
+- **Git worktree memory swarms**: Concurrent subagent memory defragmentation; design pattern for Hermes's multi-agent memory consolidation
 
 ```python
 # 1. MemFS-style git memory: Hermes could track skill evolution in git
