@@ -20,7 +20,7 @@ category: agent-engineering
 | 框架 | 版本 | 厂商 | MCP | A2A | 成熟度 |
 |------|------|------|-----|-----|--------|
 | **LangGraph** | 1.2.0 (2026-05-12) | LangChain Inc. | adapter | adapter | GA v1 |
-| **CrewAI** | 1.10.1 (2026-Q1) | crewAI Inc. | native | native | GA |
+| **CrewAI** | 1.15.21 (2026-09-09) | crewAI Inc. | native | native | GA |
 | **AutoGen** | 0.14 (maintenance) | Microsoft | native | roadmap | Beta |
 | **Microsoft Agent Framework** | 1.0 GA (2026-04-03) | Microsoft | native | native | GA+LTS |
 | **Pydantic AI** | 1.95.0 (2026-05-13) | Pydantic Inc. | native | native | GA |
@@ -54,11 +54,28 @@ category: agent-engineering
 
 ### CrewAI — 角色化团队 (最快原型)
 
-**优势**: 角色/目标/背景故事抽象直觉化；最快多Agent原型；MCP+A2A原生
+**v1.15.21 (2026-09-09) 关键更新**:
+- **Conversational Flows (stable Aug 2026)**: 从实验性升级为稳定，declarative chat flow API + TUI
+- **Execution Context Management**: UUID支持的任务上下文追踪
+- **Declarative Chat**: `declare ChatFlow` 语法，支持自定义state shape，crew-style LLM config
+- **Telemetry**: checkpoint runtime + CLI usage追踪
+- **Claude/Snowflake修复**: native structured outputs + CVE修复
+
+**企业级扩展**:
+- **CrewAI AOP (Agent Operations Platform)**: 企业控制面板，no-code可视化构建器+深度可观测性+RBAC+审计日志。已与KT(韩国)、Konecta(欧洲)达成合作
+- **Andrew Ng课程**: "Design, Develop, and Deploy Multi-Agent Systems with CrewAI" (DeepLearning.ai)，23万人已完成前序课程
+- **1.1B agentic automations** (Q3 2025)，60%美国500强使用，全球150+国家
+- **全球扩张**: Seoul(KT合作)、Madrid(Konecta合作)新办公室
+
+**核心能力**:
+- Role-Goal-Backstory抽象直觉化；最快多Agent原型
+- Pluggable backends: memory/knowledge/RAG/flow可替换，无需fork
+- Native providers: Snowflake Cortex + Bedrock + Databricks + OpenAI + Anthropic + Gemini + Azure OpenAI
+- 700k+ agent workflow patterns (Canvas builder)
 
 **劣势**: >5个Agent时抽象变黑盒；3-Agent配置token开销~18%
 
-**适用**: 快速验证多Agent概念；内容/研究流水线
+**适用**: 快速验证多Agent概念；内容/研究流水线；企业级agent治理需求
 
 ### AutoGen → Microsoft Agent Framework (迁移中)
 
@@ -240,3 +257,6 @@ async def get_db_conn(ctx: RunContext) -> DBConnection:
 - https://blckalpaca.at/en/knowledge-base/ai-agents/ai-agent-frameworks-comparison
 - https://pickaxe.co/post/crewai-vs-langgraph-vs-autogen
 - https://openagents.org/blog/posts/2026-02-23-open-source-ai-agent-frameworks-compared
+- https://docs.crewai.com/v1.15.21/en/changelog (v1.15.21 changelog)
+- https://alicelabs.ai/en/insights/best-ai-agent-frameworks-2026
+- https://crewai.com (AOP + enterprise)
