@@ -15,7 +15,13 @@ triggers:
 - **代码优先Agent**: CodeAgent用Python代码作为action，而非JSON tool calls
 - **极简主义**: 核心逻辑~1000行代码（agents.py），抽象最少化
 - **Model/Tool/Modality agnostic**: 任何LLM、任何工具、文本/视觉/音频/视频输入
-- **GitHub**: 27,700+ stars，2025年1月发布
+- **GitHub**: 27,800+ stars，v1.26.0（2026-05-29），发布周期12-15天一次
+
+## 版本现状（2026-09）
+- **无v2**: 队列标题"smol-agents v2"有误，实际最新为v1.26.0（2026-05-29）
+- v1.25.0安全强化：移除Docker/Modal的`allow_origin`，添加token认证，隔离Deno缓存
+- v1.26.0：Exa搜索选项，移除remote WasmExecutor
+- Remote Executor安全优先级：E2B/Modal/Blaxel > Docker > LocalPythonExecutor（仅原型用）
 
 ## 两种Agent类型
 
