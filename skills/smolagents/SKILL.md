@@ -15,13 +15,14 @@ triggers:
 - **代码优先Agent**: CodeAgent用Python代码作为action，而非JSON tool calls
 - **极简主义**: 核心逻辑~1000行代码（agents.py），抽象最少化
 - **Model/Tool/Modality agnostic**: 任何LLM、任何工具、文本/视觉/音频/视频输入
-- **GitHub**: 27,800+ stars，v1.26.0（2026-05-29），发布周期12-15天一次
+- **GitHub**: 29,400+ stars，v1.26.0（2026-05-29），发布周期12-15天一次
 
 ## 版本现状（2026-09）
 - **无v2**: 队列标题"smol-agents v2"有误，实际最新为v1.26.0（2026-05-29）
-- v1.25.0安全强化：移除Docker/Modal的`allow_origin`，添加token认证，隔离Deno缓存
-- v1.26.0：Exa搜索选项，移除remote WasmExecutor
+- v1.25.0安全修复：WasmExecutor loopback-only endpoint隔离、Remote Executor token认证、Docker/Modal executor移除`allow_origin`、隔离Deno缓存、修复Remote Executor高危漏洞
+- v1.26.0：Exa搜索选项、移除remote WasmExecutor
 - Remote Executor安全优先级：E2B/Modal/Blaxel > Docker > LocalPythonExecutor（仅原型用）
+- **LocalPythonExecutor明确非安全工具**：文档强调sandboxing是必需的，LocalPythonExecutor不做安全隔离
 
 ## 两种Agent类型
 
@@ -37,6 +38,47 @@ LLM生成Python代码并在sandboxed环境执行，每个推理步骤产出一�
 
 ### ToolCallingAgent
 传统JSON/text工具调用，适合需要标准tool-use范式的场景。
+
+## Multi-Agent Manager模式（核心新能力）
+
+Manager-agent协调多个专门agent，每个子agent独立记忆层，减少token消耗：
+
+```python
+from smolagents import CodeAgent, ToolCallingAgent, GoogleSearchTool, VisitWebpageTool, InferenceClientModel
+
+model = InferenceClientModel(model_id="Qwen/Qwen2.5-Coder-32B-Instruct", provider="together")
+
+# Web搜索agent
+web_search_agent = ToolCallingAgent(
+    tools=[GoogleSearchTool("serper"), VisitWebpageTool()],
+    model=model,
+    name="web_search",
+    description="Search the web and visit webpages to gather information"
+)
+
+# Manager agent
+manager_agent = CodeAgent(
+    tools=[calculate_cargo_travel_time],  # 自定义工具
+    model=model,
+    planning_interval=4  # 每4步触发一次规划，减少token消耗
+)
+
+# 注册子agent
+manager_agent.add_agent(web_search_agent)
+result = manager_agent.run(task)
+```
+
+**关键参数**：`planning_interval=N` 控制规划频率——值越大token越少，但任务质量可能下降。
+
+## 执行器安全等级
+
+| Executor | 安全等级 | 适用场景 |
+|----------|---------|---------|
+| E2B/Modal/Blaxel | ★★★★★ | 生产环境 |
+| Docker | ★★★☆☆ | 隔离要求一般 |
+| LocalPythonExecutor | ★☆☆☆☆ | 仅原型开发，禁止生产 |
+
+**注意**：LocalPythonExecutor不是安全工具，不做任何沙盒隔离。
 
 ## 工具集成（核心差异化）
 
