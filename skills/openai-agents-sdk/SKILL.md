@@ -1,6 +1,6 @@
 ---
 name: openai-agents-sdk
-description: OpenAI Agents SDK — Python lightweight multi-agent framework with Sandbox isolation, VoicePipeline, Guardrails, Handoffs. 29.3K stars MIT. Use when building multi-agent workflows with安全沙箱 or voice pipelines.
+description: OpenAI Agents SDK — lightweight Python multi-agent framework with Sandbox isolation, VoicePipeline, Guardrails, Handoffs + OpenAI Presence enterprise governance layer. Use when building安全沙箱code execution, voice pipelines, or enterprise agent deployments with guardrails/Codex改进环.
 triggers:
   - OpenAI Agents SDK
   - openai-agents-python
@@ -8,6 +8,9 @@ triggers:
   - voice pipeline agent
   - agent guardrails
   - handoffs multi-agent
+  - OpenAI Presence
+  - enterprise agent governance
+  - Codex improvement loop
 category: agent-engineering
 ---
 
@@ -15,12 +18,12 @@ category: agent-engineering
 
 ## What It Does
 
-OpenAI Agents SDK (openai-agents-python) is a lightweight, powerful framework for building multi-agent workflows in Python. Provider-agnostic, supporting 100+ LLMs beyond OpenAI. v0.22.0 (Aug 2026).
+OpenAI Agents SDK (openai-agents-python) is a lightweight, powerful framework for building multi-agent workflows in Python. Provider-agnostic, supporting 100+ LLMs beyond OpenAI. v0.22.0+ (Aug-Sep 2026). OpenAI Presence (Jul 22, 2026) is the enterprise governance layer on top.
 
 ## Core Capabilities
 
 - **Provider Agnostic**: OpenAI Responses API + Chat Completions + 100+ other LLMs
-- **Sandbox Agents**: Persistent workspace isolation with snapshotting/rehydration, multi-provider (E2B, Modal, Cloudflare, Daytona, Blaxel, Vercel, Runloop)
+- **Sandbox Agents** (Apr 2026 major update): Persistent workspace isolation, snapshot/rehydration, resumable sandbox sessions, multi-provider (E2B, Modal, Cloudflare, Daytona, Blaxel, Vercel, Runloop)
 - **VoicePipeline**: ASR + Agent + TTS pipeline in one
 - **Realtime Agents**: WebSocket voice/multimodal via `gpt-realtime-2.1`
 - **Guardrails**: Parallel input/output validation, fail-fast on check failure
@@ -30,6 +33,23 @@ OpenAI Agents SDK (openai-agents-python) is a lightweight, powerful framework fo
 - **Context**: Dependency-injection object passed through Agent.run()
 - **@tool Decorator**: Turn any Python function into a tool with auto schema + Pydantic validation
 - **Skills System**: SKILL.md-style Markdown封装，LocalDirLazySkillSource懒加载
+- **OpenAI Presence** (enterprise): SOPs + Guardrails + Approved Actions + Simulations + Evals + Codex改进环
+
+## OpenAI Presence (Jul 22, 2026)
+
+Enterprise production governance platform, not self-serve (limited GA via Forward Deployed Engineers):
+- **6组件**: SOPs + Guardrails + Approved Actions + Simulations + Evaluation tooling + Codex-powered improvement loop
+- **实测**: OpenAI自家英文电话支持(1-888-GPT-0090)75%无需人工，10天人类交接率降15pp
+- **Codex改进环**: 监控生产质量，Codex审查transcript建议更新，团队测试后控量发布
+- **EU AI Act**: 上线时间(Jul 22)恰在2026-08-02欧盟高风险AI条款可执行之后，非合规产品为已可执行高风险条款场景
+- **不适用场景**: 小规模/自托管/Hermes subagent架构（进程内协作不匹配A2A client-server模型）
+
+## Production Patterns (TURION Deep Dive)
+
+- **Direct instructions > persona theater**: 过度角色扮演反而降低LLM效果，领域特定指令更有效
+- **Guardrails = parallel safety nets**: 与主流程并行执行，不阻塞主流程
+- **Handoff vs Manager decision tree**: 需要严格控制时用manager，agent专业性明确时用handoff
+- **Sandbox Agent**: Apr 2026更新后从"wrapper"变成"完整执行harness"
 
 ## Installation
 
