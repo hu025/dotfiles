@@ -75,6 +75,25 @@ updated: 2026-09-13
 | **mem0-integration**（Hermes现有）：SQLite+TF-IDF轻量方案，官方Mem0为升级路径 |
 | **Memvid**（新增）：单文件`.mv2`便携记忆，Rust核心，无服务器。Hermes离线/便携记忆的首选方案，替代SQLite方案 |
 
+## Benchmark可信度批判（2026-09 新增）
+
+> 基准数字是信号，不是裁决。6.4%的答案密钥本身是错的（LoCoMo审计）。
+
+**LoCoMo审计**（Penfield Labs, Dec 2025）：
+- 答案密钥本身 **6.4%错误**
+- LLM裁判接受高达 **63%的故意错误答案**
+- 误差条吃掉2%的性能差距
+
+**方法论漂移**：
+- 不同slice（81题 vs 全部1,986题）
+- 不同judge和model（GPT-4o vs GPT-5-mini → 同一系统跳10分）
+- 供应商数字战（Zep vs Mem0在LoCoMo上分别报了84%/58%/75%）
+
+**真正重要指标：Recall@5 vs End-to-End Accuracy Gap**
+- Recall@5（top 5记忆是否包含证据）：接近饱和（~97%）
+- End-to-end synthesis：87% — 差距在这里
+- Field集体在优化已基本完成的检索，而推理gap无人测量
+
 ## 关键新发现
 
 ### 1. Self-Editing Memory成标配

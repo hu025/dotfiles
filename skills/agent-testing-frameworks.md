@@ -124,7 +124,8 @@ def test_refund_request(customer_support_agent):
 - 没有框架在每轮运行时进行语义分类
 - YC 2026调查：38%的agent builder明确提到评测挑战
 
-**Morph Reflex**（新生代）：
+- **Letta Context-Bench**：Stateful agent专项评估，填补"有状态"评估空白（2026-09新增）
+- **Morph Reflex**（新生代）：
 - Per-turn在线语义分类
 - <90ms延迟
 - $0.001/event（~ $0.49/百万token）
