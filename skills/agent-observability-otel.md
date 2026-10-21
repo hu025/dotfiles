@@ -1,6 +1,8 @@
 # Agent Observability & OpenTelemetry
 
 > LLM Agent 生产可观测性标准与工具链。触发词：可观测性/ tracing / span / OTel / agent监控
+>
+> 📌 **本文件负责"选什么工具"（平台选型）。** 配套文件 `research/agent-fault-detection-otel/SKILL.md` 负责"span 怎么建模 + 怎么检测故障"，含唯一一份 agent 故障检测量化基准（14 类故障 FDR 对比）与 PromQL 循环检测规则。两者分工不重叠。
 
 ## 核心概念
 
