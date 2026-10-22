@@ -130,6 +130,11 @@ promptfoo redteam run -c ~/.hermes/security/redteam.yaml
 gitleaks detect --source ~/dotfiles --no-banner
 ```
 
+## 运行时防御（在线拦截）
+
+本技能覆盖**离线红队/审计**。运行时在线拦截（分层 rails、工具调用治理、
+间接注入防护架构）见 `agent-runtime-guardrails`——两者互补，不重复。
+
 ## 参考
 
 - https://owasp.org/www-project-top-10-for-large-language-model-applications/
