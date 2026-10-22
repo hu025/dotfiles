@@ -1,3 +1,8 @@
+---
+name: fluctlightdb
+description: Rust embedded agent memory engine with a brain-native third data model.
+---
+
 # FluctlightDB — Brain-Native Agent Memory Engine
 
 ## 核心定位

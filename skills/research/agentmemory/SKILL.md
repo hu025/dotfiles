@@ -1,3 +1,8 @@
+---
+name: agentmemory-research
+description: agentmemory research notes — cross-session agent memory engine plus MCP server.
+---
+
 # agentmemory — 技能文档
 
 ## 基本信息

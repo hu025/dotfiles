@@ -70,6 +70,15 @@ metadata:
 
 ### `description` rules (HARDLINE — the validator's 1024 is NOT the standard)
 
+> **Scope of this rule.** The 60-char cap applies to **in-repo and personal
+> skills only**. The agentskills.io open standard governs *distributed*
+> third-party skills and wants the description written as a trigger condition
+> ("Use when…") up to 1024 chars, because at discovery only `name` +
+> `description` are loaded and the description carries all matching
+> responsibility. Don't retrofit the long form onto in-repo PRs — it will be
+> rejected. See `research/agent-skills-standard` for the distribution standard,
+> progressive-disclosure budgets, and skill-optimization tooling.
+
 - **≤ 60 characters.** One sentence. Ends with a period.
 - State the capability, not the implementation, and don't repeat the skill name.
 - No marketing words ("powerful", "comprehensive", "seamless", "advanced").

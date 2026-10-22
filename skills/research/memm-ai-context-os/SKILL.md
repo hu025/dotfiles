@@ -1,3 +1,8 @@
+---
+name: memm-ai-context-os
+description: MEMM/AI Context OS — filesystem-native agent memory with an L0/L1/L2 tiered model.
+---
+
 # MEMM / AI Context OS — Filesystem-Native Agent Memory
 
 ## 核心定位

@@ -1,3 +1,8 @@
+---
+name: openfang
+description: OpenFang — a Rust agent operating system and autonomous runtime.
+---
+
 # OpenFang — Agent Operating System (Rust)
 
 ## Meta

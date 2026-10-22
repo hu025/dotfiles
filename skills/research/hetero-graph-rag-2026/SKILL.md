@@ -1,3 +1,8 @@
+---
+name: hetero-graph-rag-2026
+description: WWW 2026 paper on agent-enhanced heterogeneous graph RAG for academic QA.
+---
+
 # Agent-Enhanced Heterogeneous Graph RAG (WWW 2026)
 
 ## 概述
