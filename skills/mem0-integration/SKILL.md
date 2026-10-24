@@ -65,6 +65,22 @@ results = client.search("用户喜欢什么风格?")
 3. fact_store → 精确事实查询（不变）
 4. MEMORY.md → 结构化长期事实（不变）
 
+## 召回后角色校准（重要，2026-10-25 加入）
+
+`search_memory()` 目前是「相关性排序 → 直接塞进上下文」，**没有一层判断这条记忆该不该影响当前答案**。MemSyco-Bench 的实证：Mem0/A-Mem/LightMem 上 **61–62% 的错误发生在记忆已被正确召回之后**——瓶颈在 post-retrieval 决策，不在检索。
+
+在召回路径**上游**加一层轻量分类（正则起手，成本近零），给注入的记忆定一个角色：
+
+| query 类型 | 记忆角色 | 处理 |
+|-----------|---------|------|
+| 客观事实题（`^(what\|when\|who\|where\|which\|how many\|how much)` 且无 should/compare/analyze 等主观词） | **不是证据** | 注入时附加"用户偏好是背景不是证据"提示 |
+| 明确的记忆检索（remember / remind / my favorite / my deadline） | **个性化信号** | 直接注入，信任个性化 |
+| 主观/个性化题 | **偏好** | 注入并标注"此为用户偏好" |
+
+另需给记忆条目加元信息 `role` / `scope` / `updated_at` / `supersedes`，否则模型没有做「新旧偏好仲裁」和「作用域判断」的信号。
+
+**完整方法、四个指标、正则模板、三个可移植过滤模块**：见 `research/memsyco-memory-calibration` 技能。
+
 ## 安装依赖
 ```bash
 uv pip install scikit-learn scipy numpy

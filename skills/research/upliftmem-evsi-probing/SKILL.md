@@ -364,6 +364,8 @@ u_k = U(τ_{M_k}) − U(τ_∅)                                   (Eq.50)
 
 ### 5.2 固定记忆库下的纯检索评估（MemSyco-Bench）
 
+> **互补技能**: `research/memsyco-memory-calibration` 覆盖 MemSyco-Bench 的**另一半**——本节只把它当**固定记忆库的纯检索评测集**（相关性→增益），那个技能研究的是**召回之后该分配什么决策角色**（角色校准/作用域/新旧仲裁）。两者叠加才完整：先按 uplift 选集合，再按决策角色分配使用方式。本节的 Scope Control / Evidence Conflict 类别若配上角色校准，增益曲线会更真实。
+
 把各记忆系统的原生检索器换成 UpliftMem，**记忆内容与 executor 固定不变**（这是关键的隔离设计）：
 
 | 指标 | Native | UpliftMem (4B) | UpliftMem (8B) |
