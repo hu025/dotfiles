@@ -167,6 +167,7 @@ Uplift(q, d) = S_q,d − S_q     # ← 关键定义（论文 Eq.3）
 ## 后续工作（该 limitation 已被补上）
 
 **UpliftMem** (arXiv:2609.36805, 2026-09, 北航) 把 uplift 推广到 **agent memory 检索**，并且**直接在集合级(set-level)建模**，正好补上 Uplift-RAG 的第 4 条局限：
+（→ 已完成深度研究，全文细节见独立技能 `upliftmem-evsi-probing`）
 
 - 定义 **execution uplift** = 同 executor 下"有 memory 执行"与"无 memory 执行"的效用差。
 - 指出**反馈覆盖问题**：只有被执行过的 memory 集合才有直接 uplift 标签，没被选过的集合标签永远缺失 → 低估计的集合永远选不上 → 反馈永远不来。
@@ -174,6 +175,8 @@ Uplift(q, d) = S_q,d − S_q     # ← 关键定义（论文 Eq.3）
 - 在 ALFWorld / WebShop / BigCodeBench 上取得最佳成功率。
 
 **可迁移**: Uplift-RAG 的单文档 uplift 可以直接作为 UpliftMem 式"集合级 uplift"的一个基线项；但如果要做集合级，**必须**处理反馈覆盖问题（否则 uplift 标签本身就有偏）。
+
+> **深度研究已完成** → 独立技能 `research/upliftmem-evsi-probing/SKILL.md`（2026-10-24）。要点：Prop.1 反馈覆盖上界 `p_B ≤ Σ exp(−d(a)/τ_tr)`；Prop.4 未执行集合的符号**完全不可辨识**；EVSI 闭式解 `E_j = s_j·ψ(|μ_j|/s_j)`；集合级反例（两篇单看都负、合起来为正 → 贪心会错过互补组合）；固定记忆库下决策准确率 41.7%→66.5%、谄媚率 49.0%→29.5%。代码未公开（404）。
 
 另有 **arXiv:2608.26379**《Assessing the Downstream Utility of Evidence-Aware Retrieval in RAG》从评估有效性角度做了批判性检查：把"答案支持度"信号用于 retriever 训练**不可靠改善**、用于 system selection 的收益取决于 generator 的 prompt 指令方式、基于它的检索分数**不能稳健预测**未见主题上的答案质量。对 Uplift-RAG 属于间接的负面证据，值得在采纳前留意。
 
