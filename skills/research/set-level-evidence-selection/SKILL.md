@@ -349,3 +349,15 @@ evidence recall  →  "集合覆盖全了吗？"          (选择器的直接度
 - DISCo: https://k-rt-k.github.io/DISCo/ — 稠密子集索引，把 coverage 变可索引
 - ielab/llm-rankers: https://github.com/ielab/llm-rankers — setwise ranking (heapsort) 实现参考
 - UpliftMem: https://arxiv.org/abs/2609.36805 — 集合级 uplift 不可加的反例
+
+---
+
+## 相关技能（跨层互补）
+
+- `research/skillaligner-execution-time-adaptation` — **技能层**的执行时适配。本技能管"要不要调这个工具"，
+  SkillAligner 管"检索到的技能在这次执行里该怎么用"。两者是同一套"相关不等于有用"的判据
+  在工具层和技能层上的两次应用。SkillAligner 实测：语义相关的技能会让 5.80%–17.91% 的原本成功任务变失败，
+  且更强的 backbone 并不免疫（Gemini 2.5 Pro 11.42% vs Qwen3-8B 10.30%）。
+- `research/set-level-evidence-selection` — 集合级选择优于逐篇 Top-K。SkillAligner 的 composition 阶段
+  把同一洞察用在了跨技能之间（合并重叠、按依赖排序、冲突按「硬约束 > 环境规格 > 技能建议」裁决）。
+

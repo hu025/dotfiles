@@ -513,3 +513,15 @@ Hermes 评估任何 agent 行为时，如果只看"成功/失败"，会忽略**�
 - `qmd` / `research/arxiv` — 检索工具，无训练信号设计。
 
 **去重核验**: 本次研究前 `grep -ri uplift ~/dotfiles/skills/` 仅命中 `uplift-rag`（其"后续工作"小节只有二手概述）；`grep -ri "evsi\|probe allocation"` 无命中（除无关的 LaTeX 模板）。本文所引的具体公式、Prop.1/4、EVSI 闭式解、批量采集、MemSyco 数字等**均为本次首次提取**。
+
+---
+
+## 相关技能（跨层互补）
+
+- `research/skillaligner-execution-time-adaptation` — **技能层**的执行时适配。本技能管"要不要调这个工具"，
+  SkillAligner 管"检索到的技能在这次执行里该怎么用"。两者是同一套"相关不等于有用"的判据
+  在工具层和技能层上的两次应用。SkillAligner 实测：语义相关的技能会让 5.80%–17.91% 的原本成功任务变失败，
+  且更强的 backbone 并不免疫（Gemini 2.5 Pro 11.42% vs Qwen3-8B 10.30%）。
+- `research/set-level-evidence-selection` — 集合级选择优于逐篇 Top-K。SkillAligner 的 composition 阶段
+  把同一洞察用在了跨技能之间（合并重叠、按依赖排序、冲突按「硬约束 > 环境规格 > 技能建议」裁决）。
+
