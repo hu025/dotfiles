@@ -19,6 +19,12 @@ description: Build production-grade local RAG pipelines with Ollama, Qdrant/Chro
 | Chunking | Recursive by structure, 256–512 tok, 50–100 overlap | Semantic splitter for prose |
 | Reranker | `bge-reranker-v2-m3` (cross-encoder, +20–35% precision) | `ms-marco-MiniLM-L-6` (light) |
 
+> **记忆/多轮对话场景请换成 `MemReranker`**（`IAAR-Shanghai/MemReranker-0.6B`，Apache-2.0）。
+> `bge-reranker-v2-m3` 是通用文档 reranker，分数极度左偏（挤在 0.00 附近）→ **阈值过滤失效**；
+> MemReranker 用 Elo/Bradley-Terry 把分数校准到 `[0,1]` 五档刻度（0.8-1.0=直接答案），
+> 在 LOCOMO/LongMemEval 上 0.6B 即可打平 GPT-4o-mini。详见 `research/memreranker-memory-reranking`。
+> 通用文档 RAG 仍用 bge-reranker-v2-m3。
+
 ## Architecture
 ```
 docs → chunk(512/64) → embed(nomic) → Chroma/Qdrant
