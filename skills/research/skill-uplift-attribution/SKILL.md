@@ -4,11 +4,11 @@ description: 给 Hermes 的技能/记忆召回加执行反馈回路——用 sta
 triggers: [skill uplift, execution uplift, uplift attribution, 技能增益归因, 技能有没有用, uplift 归因, 反事实对照, counterfactual baseline, 技能反馈回路, probe queue, EVSI 探测, skill utility, 技能效用评估, attribution feedback loop]
 owner: hermes-evolution
 created: 2026-10-25
-updated: 2026-10-25
+updated: 2026-10-28
 paper: 理论来源 arXiv:2609.36805 (UpliftMem, 见 upliftmem-evsi-probing 技能) —— 本技能是**自建实现**，非论文复现；论文代码未公开
 code: 本机实现 `~/.hermes/self-improvement/skill_uplift.py`（非本仓库文件，运行态脚本）
 tests: `~/.hermes/self-improvement/test_skill_uplift.py`（56 个断言）
-related_work: skills/research/upliftmem-evsi-probing (理论) / skills/research/uplift-rag (单文档 uplift) / skills/research/tool-call-uplift-gating (调用门控) / arXiv:2607.21106 (AttriMem 归因引导的过程反馈) / arXiv:2605.08374 (MemQ, provenance DAG 上的 TD(λ) 信用分配)
+related_work: skills/research/upliftmem-evsi-probing (理论) / skills/research/uplift-rag (单文档 uplift) / skills/research/tool-call-uplift-gating (调用门控) / skills/research/counterfactual-trace-auditing (行为层审计 — 本技能只看结果层, CTA 看技能到底改变了什么行为) / arXiv:2607.21106 (AttriMem 归因引导的过程反馈) / arXiv:2605.08374 (MemQ, provenance DAG 上的 TD(λ) 信用分配)
 tags: [skill-uplift, execution-uplift, attribution, counterfactual, state-db, feedback-loop, evsi-probe, hermes-self-improvement, zero-rollout]
 ---
 
@@ -152,6 +152,34 @@ evidence_tier == "none"           →  uplift=None，不报任何数字
 
 **探针（probe）也受闸门约束**：只有基线可用、且 resolved ≥ 3 时，才允许发出"这个 skill 有害"这种**指控性**结论。否则负估计只是薄数据的伪影。
 
+### 3.1.1 闸门的实施陷阱：报告路径与探针路径会漂移（2026-10-28 修）
+
+**这是一个真实修过的 bug，而且它的形态很值得记住：不是逻辑写错，是同一个数字在两条路径上算了两遍。**
+
+原来的 `SkillStats.uplift` **永远**减的是**反应基线**（`baseline_success / baseline_n`）。报告路径（`build_report`）意识到了这个问题，会针对每个技能**重新**用分层匹配的臂算一次 uplift；但 `select_probes` **没有**——它直接读 `st.uplift`。于是同一个技能在报告里显示 +0.113、在探针队列里被判为"negative-uplift-suspect"（"audit this skill: it correlates with WORSE outcomes"）。
+
+**实测后果（修复前）**：三个技能被**误指控**为有害——
+
+| 技能 | 报告里显示的 uplift | 探针队列里被判 | 真相 |
+|---|---|---|---|
+| `daily-news-compilation` | **+0.112** | negative-uplift-suspect | **正增益** |
+| `agent-orchestration` | **+0.112** | negative-uplift-suspect | **正增益** |
+| `browser-use` | **+0.143** | negative-uplift-suspect | **正增益** |
+
+根因就是 §5.1 那条规则本身：Tier-2 自报后验被拿去减 Tier-1 反应基线（本机 rate=1.0）。**自报说"成功"但反应基线全是"成功"**——两个都是"成功"，差值却是 −0.36（看起来像大幅有害）。实际上把它们分别跟**自己的同层基线**比，差异只是 +0.11。
+
+**修法**：抽出单一函数 `tier_matched_arm()` / `tier_matched_uplift()`，**报告路径和探针路径都调它**，两者不可能再漂移。同时收紧指控门槛：
+
+- 只有 **Tier-1（人类反应）** 证据才允许指控（自报可以排序，**不能指控**）
+- 必须 `resolved >= MIN_SIGNAL_N` **且** `n_sessions >= 2`
+- 参照臂必须可用
+
+**修后**：三个假指控全部消失，探针值与报告值**逐位一致**；只留下一个真正 Tier-1 负增益的技能。
+
+> **通用教训**：当"分层基线"这类概念需要按上下文档位选择参照臂时，**绝对不能把选择逻辑写两遍**。写一遍的代价不是重复劳动，是**两份逻辑悄悄分叉**，而且分叉的那份往往还产出更响亮的结论（"这个 skill 有害"比"这个 skill 有用"更容易被忽略地接受）。**把参照臂选择收进一个函数，两个调用方共用。**
+>
+> **另一个教训**：探针队列是**带指控语气的**输出（"audit this skill: it correlates with WORSE outcomes"）。它的措辞比它的计算更容易被当成事实。这类输出必须和它旁边显示的数字**逐位自洽**。
+
 ### 3.2 Probe 队列：三类
 
 对应 UpliftMem 的反馈覆盖问题（Proposition 4：未被执行的候选集，其符号不可辨识）：
@@ -258,6 +286,8 @@ signal funnel: 47 skill_views -> 28 resolved outcomes (19 unknown);
 5. **只覆盖 skill，不覆盖 memory 召回**。memory 条目没有 `tool_name='skill_view'` 这样的事件锚点，暂未纳入。
 6. **基线 arm 依赖会话内前后对比**，对"第一个动作就加载技能"的任务无参照。
 7. **反应基线本身没有区分力**。本机 n=8 rate=1.0——8 条人类反应全是正面。作为对照基线，它无法区分"好技能"和"一般技能"，只能区分"有反应"和"没反应"。要拿到有区分力的基线，需要人类反馈里出现**否定样本**（这也是 §7.3 提轻量反馈通道的原因）。
+8. **只看结果层，看不到行为变化**。本模块测的是 ΔP（做成了没有），不是"agent 的行为被改变了什么"。arXiv:2605.11946 (CTA) 的实测：49 个任务里平均 ΔP 仅 +0.3pp，但同一批配对轨迹里有 **522 处**行为层面的结构性变化。**uplift=0 不等于"这条技能没用"**。行为层方法见 `counterfactual-trace-auditing` 技能。
+9. **成本没进报告**。CTA 揭示了一类 ΔP 完全看不见的损害：技能让 agent 在结果已达成后继续劳动（论文实测 12 个 ceiling 任务 ≥1.5× token overhead 而 ΔP≤0）。本模块有 action 计数但**没有把 token/action 成本纳入 uplift**，因此无法报出这类"饱和空转"。
 
 ---
 
@@ -267,6 +297,8 @@ signal funnel: 47 skill_views -> 28 resolved outcomes (19 unknown);
 2. **把"高使用×低归因"变成常驻告警**：不需要 uplift 数值就能算，是最可靠的信号（`novel-writing` 376:1 就是例子）。
 3. **用真人类反馈补样本**：让 QQ/飞书端提供一个"👍/👎"或一句话评价的轻量通道，把归因样本从 28 提到几百。**关键在于要能收到否定反馈**——只收正面反馈会让基线永久停在 rate=1.0。
 4. **负增益存档**：论文 §4.4 的"无论是否入库都提供 uplift 标签"。当前 Hermes 的技能归档只看 `use_count`，不看"用完是否更糟"。
+5. **加成本维度（SATURATION 探测）**：CTA 案例 4/5 表明"技能让 agent 在结果已达成后继续劳动"是 ΔP 看不见的损害。对同一 session 比较 with-skill 与 pre-skill 段的 token/action 数，与结果是否变化脱钩——成本显著抬高但结果不变 → 疑似饱和空转。数据已在 `state.db` 里，成本接近零。
+6. **分桶基线**：CTA 证明 dominant 效应类型随 baseline 桶变化（ceiling→表面锚定，mid/floor→边角提示）。一旦 §7.3 的轻量反馈通道上线有了连续的 baseline 评分，分桶匹配臂就可行——这比全局基线更准。
 
 ---
 
