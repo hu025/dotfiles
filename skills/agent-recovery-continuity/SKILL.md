@@ -274,7 +274,14 @@ Useful for follow-up research:
   agent checkpoint-restore.
 - **AgentRewind** (arXiv:2608.14380) — jointly checkpoints agent context
   *and* execution environment. This is the design that closes SF1/SF2 for
-  the agent-side domain by construction.
+  the agent-side domain by construction. **Full mechanism breakdown,
+  MettleBench numbers, ablations, and the replay-agent-recorder tooling:
+  see `references/agentrewind-mechanism.md`.** One-line takeaway for this
+  skill: environment rewind is the single largest contributor (removing it
+  costs 44pp task success vs 22pp for removing context rewind), and the
+  paper leaves SF5 (external effects) and rewind-memory growth unsolved —
+  exactly the two things this skill's effect-ledger and bounded-memory
+  rules cover.
 - **CRAB** (arXiv, semantics-aware checkpointing), **DeltaBox**
   (low-latency sandbox checkpoint/rollback).
 - **Shepherd** (arXiv:2605.10913) — reversible agentic execution traces.
