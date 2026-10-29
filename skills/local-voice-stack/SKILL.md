@@ -196,3 +196,34 @@ Gemma 4 默认强制输出 reasoning trace，导致 tool-call 结果落入 `reas
 1. 停止 ESP32 端唤醒服务
 2. 在 PC 部署完整 Wyoming 栈
 3. 通过 mqtt 或 http 与 Home Assistant 互联
+
+## Home Assistant Assist 集成
+
+```yaml
+# configuration.yaml
+conversation_engine: conversation.ollama_conversation
+tts_engine: tts.piper
+stt_engine: stt.faster_whisper_gpu
+```
+
+
+## Home Assistant 2026.6 Wyoming 集成改进
+无需编辑 YAML，UI 直接配置：
+- Settings → Voice assistants → 新建 Assistant
+- 选 Conversation agent / Speech to text / Text to speech
+- `prefer_local_intents: true` 仍需在配置中设置
+
+## 补自旧副本的独有内容（local-voice-stack，合并于 2026-10-29）
+
+- **Piper**：`pip install piper-tts`
+当前 `xiaozhi-esp32-server` 是专属语音服务，若迁移到PC本地：
+3. 通过mqtt或http与Home Assistant互联
+**Piper TTS 已于 2025年10月归档**（rhasspy/piper），但仍可使用。
+| 方案 | 参数量 | 许可证 | CPU性能 | 备注 |
+|------|--------|--------|---------|------|
+| **Kokoro** | 82M | Apache-2.0 | 6x实时 | TTS Arena #1，音质最佳 |
+| Piper | - | - | 实时（RPi5） | 已归档，仍可用 |
+| Chatterbox | - | MIT | 需GPU | 10秒音频克隆声音 |
+| XTTS | - | 商用 | 需GPU | 语音克隆 |
+**Kokoro 安装**：`pip install kokoro-onnx` 或通过 Home Assistant Wyoming 集成
+Hermes已有TTS工具（text_to_speech），本地语音栈可以作为：
