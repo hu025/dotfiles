@@ -25,6 +25,7 @@ Agno is an open-source Python framework for building production-grade multi-agen
 - **Agent Teams**: Coordinate, collaborate, or supervisor patterns; narrow-scoped agents with shared context; Team Modes, HITL for Teams, Approval System
 - **Knowledge & Retrieval**: Agentic RAG as default (模型决定何时search); Hybrid Search (vector + keyword); 17 VectorDB backends; knowledge is writable = agent can persist learning
 - **Memory & Storage**: Built-in `Storage` and `Memory` drivers; entity memory per user; SQLite/Postgres/Mongo/Redis/DynamoDB/Firestore backends
+- **Monitoring**: Real-time session and performance monitoring at agno.com (or self-host)
 - **Structured Outputs**: Return fully-typed Pydantic responses via model structured outputs or `json_mode`
 - **Pre-built FastAPI Routes**: Serve agents as HTTP endpoints in minutes
 - **AgentOS Runtime**: Run agents as production services with tracing, scheduling, RBAC, multi-user support

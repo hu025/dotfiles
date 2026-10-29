@@ -1,0 +1,68 @@
+{
+  "year": "丙午",
+  "month": "戊戌",
+  "day": "乙亥",
+  "hour": "丙戌",
+  "day_gan": "乙",
+  "day_zhi": "亥",
+  "gender": "男",
+  "birth": {
+    "year": 2026,
+    "month": 10,
+    "day": 28,
+    "hour": 19,
+    "minute": 45
+  },
+  "dayun": [
+    {
+      "ganzhi": "己亥",
+      "start_age": 3.1,
+      "end_age": 13.1
+    },
+    {
+      "ganzhi": "庚子",
+      "start_age": 13.1,
+      "end_age": 23.1
+    },
+    {
+      "ganzhi": "辛丑",
+      "start_age": 23.1,
+      "end_age": 33.1
+    },
+    {
+      "ganzhi": "壬寅",
+      "start_age": 33.1,
+      "end_age": 43.1
+    },
+    {
+      "ganzhi": "癸卯",
+      "start_age": 43.1,
+      "end_age": 53.1
+    },
+    {
+      "ganzhi": "甲辰",
+      "start_age": 53.1,
+      "end_age": 63.1
+    },
+    {
+      "ganzhi": "乙巳",
+      "start_age": 63.1,
+      "end_age": 73.1
+    },
+    {
+      "ganzhi": "丙午",
+      "start_age": 73.1,
+      "end_age": 83.1
+    }
+  ],
+  "shishen_power": {
+    "伤官": 2,
+    "正财": 2.4,
+    "比肩": 1,
+    "食神": 0.8999999999999999,
+    "偏财": 0.2,
+    "七杀": 0.4,
+    "正印": 0.7,
+    "劫财": 0.2
+  }
+}

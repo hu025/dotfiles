@@ -82,6 +82,13 @@ sandbox:
   image: ghcr.io/swe-agent/swe-agent:latest
 ```
 
+## mini-swe-agent v2 Core Design Principles (Aug 2026)
+
+- **No custom tools, only bash** — doesn't even need tool-calling interface; any model works
+- **Linear history** — each step appends to messages; trajectory = messages = prompt; trivial for debugging/FT
+- **subprocess.run per action** — every action is independent; easily swappable sandbox (`docker exec`); scales effortlessly
+- **v2 migration guide**: https://mini-swe-agent.com/latest/advanced/v2_migration/
+
 ## SWE-bench Verified Leaderboard (2026)
 
 | Agent | Model | Verified | Full | License |
