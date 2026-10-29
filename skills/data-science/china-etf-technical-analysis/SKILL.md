@@ -67,13 +67,21 @@ https://push2his.eastmoney.com/api/qt/stock/kline/get?secid={MARKET}.{SECID}&fie
 - Market: `1`=Shanghai, `0`=Shenzhen
 - ⚠️ **Pitfall**: often times out from mainland China; use Tencent K-line API instead
 
-### Known ETF secids
-- 芯片ETF国泰: `1.512760` — 历史最高¥1.38（2026-07）
-- 科创50ETF易方达: `1.588080`
-- 酒ETF华夏: `1.512690` — 成本¥0.403，持仓中（2026-07-03）
-- 军工ETF: `1.515220` — RSI 22.7超卖，关注
-- 科创50ETF广发: `1.588060`
-- 通信ETF华夏: `1.515050`
+### Known ETF secids (verified 2026-09-10 — all Shanghai 5xxxxx codes)
+| ETF | Code | Current Price | Notes |
+|-----|------|-------------|-------|
+| 医疗ETF | 512170 | ¥0.334 | 🔥 历史极低位 |
+| 券商ETF | 512010 | ¥0.371 | 🔥 历史极低位 |
+| 酒ETF | 512690 | ¥0.412 | 🔥 历史极低位 |
+| 证券ETF | 512000 | ¥0.502 | 🔥 历史极低位 |
+| 银行ETF | 512800 | ¥0.846 | 📉 偏低 |
+| 科创芯片 | 515980 | ¥0.985 | 📉 偏低 |
+| 科创50ETF2 | 588060 | ¥0.999 | 📉 偏低 |
+| 通信ETF | 515050 | ¥1.027 | 正常 |
+| 中证500ETF | 512900 | ¥1.041 | 正常 |
+| 芯片ETF国泰 | 512760 | ¥1.038 | 正常 |
+| 红利ETF | 515100 | ¥1.408 | — |
+| 科创50ETF | 588080 | ¥1.612 | — |
 
 ## Technical Analysis (Python)
 
@@ -154,7 +162,19 @@ if m:
     price = float(f[3]); chg_pct = float(f[32])
 ```
 
-- **EastMoney K-line API (`push2his.eastmoney.com`) unreliability in sandbox/execute_code**: The EastMoney K-line endpoint frequently fails in `execute_code` sandbox with `RemoteDisconnected: Remote end closed connection without response`. Workaround: use **Tencent K-line API** instead — `https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayqfq&param=sh{SECID},day,,,{COUNT},qfq`. Returns JSON embedded as `kline_dayqfq={...}`. Parse with `re.search(r'=({.*})', raw)` then `json.loads(m.group(1))`. Works reliably in sandbox environments.
+- **Tencent K-line API returns `day` not `qfqday`** — the `etf_ta_works.py` reference script hardcodes `qfqday` key which silently returns empty lists. Fixed: use `data.get('day', []) or data.get('qfqday', [])`. Verified 2026-09-10.
+- **Tencent K-line API silently fails in `execute_code` sandbox** — most ETF codes return empty data in sandbox even with `subprocess.run`+curl. Use `terminal` tool instead for K-line fetches. Only one ETF may succeed in a given sandbox session. Workaround: use `terminal` for all K-line work, not `execute_code`.
+- **EastMoney push2 API fails in sandbox (`exit code 56`)** — `execute_code` sandbox cannot reach EastMoney APIs. Use `terminal` for all A-share financial data. Only `terminal` tool works reliably for Chinese market data in this environment.
+- **EastMoney push2/push2his can be down for HOURS at a time (verified 2026-10-24, 8h+)** — `RemoteDisconnected('Remote end closed connection without response')` on BOTH `push2.eastmoney.com/api/qt/clist/get` AND `push2his.eastmoney.com/api/qt/stock/kline/get`, while `www.eastmoney.com` and `datacenter-web.eastmoney.com` still return 200. So it's the push2 API tier specifically, not the whole domain, and it's not transient. **Do not wait it out — switch sources.**
+  - Verified-working akshare fallbacks (all live-tested 2026-10-24):
+    - `ak.fund_etf_category_sina(symbol="ETF基金")` → ~1714 ETFs, columns `代码/名称/最新价/涨跌额/涨跌幅/买入/卖出/昨收/今开/最高/最低/成交量/成交额`. Codes are prefixed (`sh`/`sz`).
+    - `ak.fund_etf_hist_sina(symbol="sh512760")` → ~1786 daily rows, columns `date/open/high/low/close/volume/amount/postVol/postAmt`. **Requires the `sh`/`sz` prefix.**
+    - `ak.fund_etf_fund_daily_em()` → ~1689 rows (datacenter-web tier, survives push2 being down).
+  - Tencent `https://qt.gtimg.cn/q=sh512760` also works as a single-quote fallback.
+  - **Gotcha**: sina history is NOT qfq-adjusted (东财 is), so 52-week high/low differ slightly between sources — acceptable for screening, note it if precision matters.
+  - **Gotcha**: sina returns `open/high/low/close/volume/amount` in English; eastmoney returns `日期/开盘/收盘/最高/最低/成交量/成交额`. Normalize to one set of Chinese column names before calling any shared code, or `get_52w_high_low()` will KeyError on `最高`.
+  - **Gotcha**: sina needs the prefix but eastmoney needs a bare 6-digit code. Keep the prefix in the list and strip it only when calling the eastmoney path.
+  - `~/.hermes/scripts/etf_screener.py` now implements this fallback chain — reuse it rather than rewriting.
 - Tencent QT API returns GB2312/GBK encoded data; wrap decode in `errors='replace'` fallback. Raw curl output may show garbled Chinese — use Python to parse.
 - Tencent QT response format: `v_sh{SECID}="..."` — extract with regex `"([^"]+)"`. Fields split by `~`: index 1=name, 3=price, 4=prev_close, 5=open, 6=volume, 31=chg, 32=chg_pct, 33=day_high, 34=day_low.
 - RSI calculation: ensure `n >= period+1` before accessing `closes[-period-1]`

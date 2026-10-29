@@ -334,6 +334,83 @@ spider.start()  # Ctrl+C to pause, re-run to resume from checkpoint
 - **Legal**: always check robots.txt and website ToS before scraping. This library is for educational and research purposes
 - **Python version**: requires Python 3.10+
 
+## Anti-bot platforms: structured data, not just pages
+
+When a site serves a **captcha interstitial** to headless browsers, and you
+need structured data (titles, authors, engagement counts, media URLs) rather
+than a readable page, the extraction path is different from Scrapling's
+fetchers. Three rules carry the whole class of work:
+
+1. **Headless Chromium is detected; a patched fingerprint is what passes.**
+   A stealth browser (CloakBrowser) reports `navigator.webdriver == False`
+   and gets the real page plus the risk-control cookies. Headless is fine —
+   the earlier assumption that a captcha wall implies you need a *headed*
+   browser is wrong; it implies you need a *patched* one.
+2. **Intercept the page's own API responses; never construct the request.**
+   A hand-built call to a detail endpoint returns
+   `403 Blocked by ArgusSecurityPlugin Sign Invalid` — the signature cookie is
+   bound to the request context. The page's own XHRs are already signed, so
+   register a response handler and read the payload it received. Scroll to
+   paginate the feed.
+3. **Fetch media over plain HTTP, not through the browser.** Captured CDN URLs
+   are signed; a plain GET with `Referer` + a desktop `User-Agent` downloads
+   them and needs **no cookies**. Routing bytes through the page fails because
+   the platform's security SDK patches `window.fetch` and breaks cross-origin
+   fetches.
+
+Full worked recipe (stealth-browser install, the XHR-interception pattern, the
+Netscape cookie-jar format rules, the QR-login endpoint, keeping a stealth
+browser alive across a long wait, and the checklist before declaring a site
+unreadable): `references/anti-bot-platform-reading.md`.
+
+`scripts/fetch_login_qr.py` — fetches a fresh login QR for a QR-login site by
+calling the QR endpoint from inside the stealth browser's own page context.
+Runnable as-is after editing `SITE_HOST` / `QR_PATH` / `QUERY`. Writes a
+`*.meta.json` sidecar with the token and expiry.
+
+**Mint short-TTL artifacts on demand, not from a background refresher.** A
+login QR lives ~60 s and the page does *not* re-request one when it expires —
+a watcher that only listens for responses never sees a second code, and a
+code sent late is a wasted scan. Run the generator when the user says they
+are ready, tell them the expiry time, and let a separate watcher poll for the
+scan result. Give the generator and the watcher **different browser
+profiles**: two chromium instances on one profile directory die with
+`Failed to create a ProcessSingleton`. The token is server-issued and not
+profile-bound, so separating them is safe.
+
+**Reading is not writing.** A login credential on a scraper unlocks *reading*
+— public content behind that account. It does not authorize posting,
+commenting, liking, following, or DMing. If the user hands over an account
+for scraping, use it to read. If they later want publishing, that is a
+separate explicit authorization — say what the account would be used for and
+get agreement on the scope (what to publish, where, how often, and whether a
+human reviews it) before writing anything under that identity.
+
+**State the capability delta before asking for a credential.** A dedicated
+account often unlocks less than expected: measure what the *anonymous*
+session can already do, and say plainly which one capability the login would
+add. On a QR-login platform, public feed + video detail + download usually
+work without any account; the real delta is often just search and complete
+comment threads. Offering that breakdown — and often recommending *not*
+logging in — is better service than eagerly asking for credentials. Logging in
+also raises risk (a cookie lands on disk; the platform's risk control is
+stricter on authenticated sessions), so an unused account is a net liability.
+
+**Authorisation is scope-specific, and the boundary is write vs read.** When
+a user says "the account is yours", that covers reading and using it within
+the task at hand; it does not by itself authorise broadcasting under that
+identity. Read the request as: act freely *inside* the granted scope, and ask
+once — with the scope spelled out — before crossing into anything
+irreversible (publishing, posting, contacting people). Say plainly what you
+will and will not do with it rather than discovering the boundary by asking
+permission for every small step.
+
+**Cookie-jar export trap:** Python's `http.cookiejar` asserts
+`domain_specified == initial_dot`, so in a Netscape cookie file the domain
+column and the includeSubdomains column must agree (`.site.com`↔`TRUE`,
+`site.com`↔`FALSE`). Disagreement makes the tool reject the whole file, and
+`expires` must be a future epoch — session cookies (`-1`) get skipped.
+
 ## Cloudflare / Bot-Protected Site Workarounds
 
 When `StealthyFetcher` is unavailable or `browser_navigate` gets blocked, try these in order:
@@ -346,6 +423,26 @@ When `StealthyFetcher` is unavailable or `browser_navigate` gets blocked, try th
    ```
    Then convert with Pillow if needed: `Image.open('a.webp').save('a.jpg', 'JPEG')`
 4. **Thingiverse / GrabCAD / Printables / Cults3D** — all block non-browser clients with Cloudflare. Use `browser_navigate` if available, or search via GitHub instead
+
+## Downloading large assets when a single connection is throttled
+
+Some CDNs and the GitHub release-asset endpoint cap each connection hard
+(observed: ~25 KB/s per connection). A single stream then takes hours for a
+few hundred MB. The API asset endpoint supports `Range`, so N workers over
+fixed-size ranges multiply throughput (observed: 12 workers × 4 MB ranges →
+~230 KB/s, a 9× improvement, turning a 137-minute fetch into 14).
+
+```python
+# each worker writes its own .partN file; concatenate, then verify
+ranges = [(i, pos, min(pos + CHUNK - 1, total - 1)) for i, pos in ...]
+with cf.ThreadPoolExecutor(max_workers=12) as ex:
+    ex.submit(fetch, i, start, end, out)   # GET with Range: bytes=start-end
+# then concatenate in order and sha256 against the digest the API published
+```
+
+Retry each range with a bounded attempt count, resuming from what the part
+file already holds. **Verify the sha256 against the digest the release
+metadata advertises** before using the file.
 
 ## Vision Tool Local File Limitation
 

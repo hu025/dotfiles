@@ -30,6 +30,28 @@ Structured decision-making format for when a task has multiple viable approaches
 
 Do NOT use for simple questions with one obvious answer, debugging sessions, or tasks where the user has already decided on an approach.
 
+## When NOT to present options — decide instead
+
+This framework is for when the user **wants** a decision aid. It is actively
+harmful in the opposite case. Signals that the user has delegated the call:
+
+- "你来决定" / "你决定" / "你自己决定"
+- "全部修复" / "你来处理"
+- "不要问我" or any explicit statement that they don't want to be the decider
+
+When you see those, **stop offering choices and act.** Pick the approach with
+the best evidence, execute it, and report what you did and why. A user who
+delegated and then receives another menu has been asked to do the work twice.
+
+The one exception is a decision with **irreversible or externally-visible
+consequences** (deletions of real data, anything that touches credentials or
+platform accounts, anything where the user may hold context you lack). Even
+then: state your decision, state what it costs, and ask only about the
+irreversible part — not for permission on the routine parts.
+
+Asking permission for routine reversible work is not caution, it is friction.
+Reserve the question budget for the decisions that actually need it.
+
 ## Procedure
 
 1. **Problem** (one sentence)

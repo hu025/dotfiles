@@ -75,3 +75,58 @@ hermes skills list --category=productivity
 # Validate integrity of all installed skills
 hermes skills validate --full
 ```
+
+## Deduplicating same-named skills
+
+Nested installs produce the same skill at several paths
+(`foo`, `foo/foo`, `software-development/foo`, …). Hermes resolves by **basename**,
+so every extra copy is a load-time ambiguity. Clear it with content hashing —
+never by path shape alone, because two same-named skills can be genuinely
+different versions.
+
+**1. Back up the whole directory first.** Dedup deletes; there is no undo.
+```bash
+tar czf ~/.hermes/cache/scratch/skills-backup-$(date +%Y%m%d-%H%M%S).tar.gz \
+  -C ~/.hermes/skills .
+```
+Check the archive is non-trivial in size — a near-empty tarball means the
+source path was wrong, and you just backed up nothing.
+
+**2. Group by basename, then split each group by SKILL.md content hash.**
+
+```python
+import os, hashlib
+from collections import defaultdict
+root = os.path.expanduser('~/.hermes/skills')
+groups = defaultdict(list)
+for dp, _, fs in os.walk(root):
+    if 'SKILL.md' in fs:
+        rel = os.path.relpath(dp, root)
+        groups[rel.split('/')[-1]].append(os.path.join(dp, 'SKILL.md'))
+```
+
+**3. Act on the split, not the raw group size.** Two outcomes, and only one is
+safe to touch:
+
+| Split | Verdict | Action |
+|---|---|---|
+| one hash — every copy byte-identical | **pure redundancy** | delete all but one |
+| multiple hashes | **real conflict** — different versions | delete nothing; a human decides which survives |
+
+A session that reported "148 duplicate groups" and then deleted 148 groups
+would have destroyed 51 distinct skill versions. Report both numbers
+separately: how many groups were redundant vs. conflicting.
+
+**4. Keep the shallowest copy.** Prefer the shortest path (top-level wins), so
+`skill_view` hits it without a long qualifier. Note that "shallowest" can tie —
+two copies at the same depth are interchangeable, so pick one deterministically
+(e.g. lexicographic) rather than treating the tie as an error.
+
+**5. Re-verify the hash immediately before each delete.** Recompute it against
+the keeper and skip the file if it changed — a concurrent `hermes skills
+update` can rewrite a copy between your scan and your delete. Walk the target
+directory to sum its size before `rmtree` so the freed-space report is real.
+
+**6. Re-scan and report the delta.** Unique names, remaining duplicate groups,
+and space freed. The remaining group count should equal the conflict count from
+step 3; if it doesn't, something was classified wrong.

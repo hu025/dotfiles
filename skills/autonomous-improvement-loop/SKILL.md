@@ -49,6 +49,22 @@ python3 ~/.hermes/self-improvement/agent_core.py status
 5. **浏览器自动化** — 稳定？新页面结构？
 6. **自主改进** — 本周成功率趋势，最该改进的 1-3 点
 
+## 陷阱与排查
+
+### autonomous_research HTTP 401
+`autonomous_research()` 调用 `localhost:8642/v1/chat/completions` 时：
+- **必须**提供有效的 `Authorization: Bearer <API_SERVER_KEY>` 请求头
+- subagent 子进程**不继承**父进程环境变量（`get_secret("API_SERVER_KEY")` 在 subagent 中返回空）
+- 正确做法：从 `~/.hermes/auth.json` 的 `credential_pool` 获取，或从 systemd service 环境变量注入
+- 验证：`curl -s -X POST http://localhost:8642/v1/chat/completions -H "Authorization: Bearer <key>" -H "Content-Type: application/json" -d '{"model":"minimax-m2.7","messages":[{"role":"user","content":"hi"}],"max_tokens":5}'`
+- gateway 8642 端口强制校验 API key，不允许无认证访问
+
+### subagent 无法重启 gateway
+gateway 进程本身不能执行 `systemctl --user restart hermes-gateway.service`（SIGTERM 会同时杀死子进程）。解决：用 `delegate_task` 在独立子 agent 中执行重启。
+
+### 相关参考
+- `references/api-server-key.md` — API_SERVER_KEY 获取、配置、验证的完整指南
+
 ## 禁止事项
 
 - 不做无意义循环

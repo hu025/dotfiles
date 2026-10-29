@@ -84,6 +84,32 @@ Reflexion 循环已内置于 `agent_core.py reflexion` 命令。
 2. 运行反思：`agent_core.py reflexion`
 3. 下次同类任务，agent 自动读取 reflections.json 获取历史教训
 
+## LLM 评估器集成（2026-09-07 升级）
+
+`agent_core.py` 中的 `reflexion_evaluate()` 和 `reflexion_reflect()` 已升级为优先调用 LLM：
+
+```python
+# 通过本地 Hermes API 调用
+def _call_llm(prompt: str, model: str = None) -> str:
+    api_key = _get_api_key()  # 从 ~/.hermes/.env 读取 API_SERVER_KEY
+    response = requests.post(
+        "http://localhost:8642/v1/chat/completions",
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json={"model": "auto", "messages": [{"role": "user", "content": prompt}]},
+        timeout=30
+    )
+
+# Evaluator 输出结构
+{"score": 0.85, "verdict": "pass", "issues": [...], "missing_elements": [...]}
+
+# Reflector 输出结构
+{"root_cause": "...", "fix_suggestion": "...", "keywords": [...]}
+
+# fallback：LLM 超时则自动回退到启发式评分
+```
+
+**prompt 文件**：`~/.hermes/self-improvement/logs/prompt_reflexion_evaluator.md`
+
 ## 相关研究
 
 - SWE-RL (Meta)：self-play 生成 bug 再修复，+10.4 points

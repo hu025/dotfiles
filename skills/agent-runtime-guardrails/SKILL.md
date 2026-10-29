@@ -8,15 +8,6 @@ description: Runtime defense layers for tool-calling LLM agents.
 Runtime defense architecture for tool-augmented LLM agents. Complements
 `llm-security` (offline red-teaming/audit) — this skill is the **online enforcement** side.
 
-## When to Use
-
-- Designing or reviewing runtime defense for an agent that calls tools
-  (terminal, HTTP, MCP, browser, file writes).
-- Choosing a guardrail framework, or deciding whether you need detection vs.
-  validation vs. governance.
-- Hardening a local agent (Hermes-style) against indirect prompt injection.
-- NOT for offline red-teaming / OWASP audits — use `llm-security` for those.
-
 ## The core insight
 
 **Detecting an unsafe answer is not the same as preventing an unsafe action.**
@@ -185,7 +176,44 @@ Concrete hardening for a local agent with terminal + web access:
    Never blend them into a single F1 — a rail that blocks everything scores 1.0
    on ASR and is useless.
 
-## Selection guide
+## Refusing to the user: state the line once, then pivot to what you will do
+
+A guardrail that fires against the *user's own* request is a different problem
+from an injection. The technical layers above assume an adversary; here the
+requester is the principal. Two failure modes to avoid:
+
+**Over-explaining turns a refusal into a lecture.** Restating the reason at
+length on every follow-up reads as moralizing and trains the user to keep
+pushing. Say the boundary in a sentence or two, once. Then move to the
+substantive part: what you *will* do instead. Repeating the rationale across
+five exchanges of the same request is the failure, not the first refusal.
+
+**Do not fabricate capability to satisfy the request.** When asked to "just do
+it for me" — operate an account, run automation, impersonate someone — do not
+reach for a technical dodge that implies the action is merely a matter of
+configuration. The reason it is declined should be the real one (terms of
+service, the user's own asset at risk, lack of a running process), and it
+should be stated once.
+
+**Separate the tool from the goal.** Requests frequently bundle a blocked
+mechanism with a legitimate objective: "have the AI reply to my DMs for me"
+conflates drafting content (fine, the user reviews and sends) with logging
+into their account and acting as them (not fine). Naming the split concretely
+is far more useful than a flat no — it lets the user get most of what they
+wanted. Offer the adjacent thing you *will* build, with the residual work left
+in their hands.
+
+**When the goal is unreachable, say why it is structurally unreachable.** An
+LLM has no persistent process between turns, so it cannot hold an account,
+monitor a feed, or initiate contact on its own. Saying "I'd need a separate
+always-running service with its own credentials — and then it isn't me" is
+more honest and more actionable than either compliance or a vague no.
+
+**Verify third-party artifacts before dismissing them.** When the user shares
+an unvetted plugin, script, or link, the honest move is often *analysis*, not
+refusal: unpack it in an isolated sandbox with no network egress and report
+what it actually does. Refusing to look is indistinguishable from refusing to
+help, and leaves the user with only the vendor's description.
 
 | Need | Reach for |
 |---|---|

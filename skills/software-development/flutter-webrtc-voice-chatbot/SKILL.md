@@ -462,3 +462,5 @@ Tested on: Xiaomi puding (BP2A.250605.031.A3)
 - `/home/saber/voip-ai-phone/server/agent.py` - AI streaming server (port 8765)
 - `/home/saber/voip-ai-phone/PLAN.md` - Architecture plan
 - `$FLUTTER_SDK/packages/flutter_tools/gradle/src/main/kotlin/FlutterExtension.kt` — NDK version default
+- `/home/saber/hermes_companion/` — Simplified companion APP (no WebRTC, just chat + LLM)
+- `references/china-install-and-build.md` — Flutter SDK + Android SDK install under China network

@@ -443,12 +443,13 @@ for d in os.listdir('/sys/bus/usb/devices/'):
 
 **pyserial 需安装到 hermes venv**（系统 Python 无此模块）：
 ```bash
-/home/saber/.hermes/hermes-agent/venv/bin/pip3 install pyserial -q
+HP=$(ls ~/.hermes/hermes-agent/venv/bin/python3 2>/dev/null || ls ~/.hermes/hermes-agent/.venv/bin/python3 2>/dev/null)
+"$HP" -m pip install pyserial -q
 ```
 
 **MAVLink 连接**（推荐）：
 ```bash
-/home/saber/.hermes/hermes-agent/venv/bin/pip3 install pymavlink -q
+"$HP" -m pip install pymavlink -q
 python3 -c "
 from pymavlink import mavutil
 m = mavutil.mavlink_connection('/dev/ttyACM0', baud=115200)
