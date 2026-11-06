@@ -17,7 +17,9 @@ if [ -z "$1" ]; then
         if [ -d "$src" ]; then
             # 检查是否有更新
             if [ ! -d "$dst" ] || [ "$(find "$src" -name '*.md' -newer "$dst" 2>/dev/null | head -1)" ]; then
-                cp -r "$src" "$dst" && echo "✓ $name"
+                # 用 rsync 语义就地覆盖：`cp -r $src $dst` 在 dst 已存在时会变成
+                # $dst/<name>/（多套一层），历史上 skills 里 32 组 X/X 重复就是这么来的
+                mkdir -p "$dst" && cp -a "$src/." "$dst/" && echo "✓ $name"
                 SYNC_COUNT=$((SYNC_COUNT+1))
             fi
         fi
@@ -27,7 +29,8 @@ else
     src="$DOTFILES_DIR/skills/$1"
     dst="$HERMES_DIR/$1"
     if [ -d "$src" ]; then
-        cp -r "$src" "$dst" && echo "✓ $1 synced"
+        # 同上：就地覆盖，避免 cp -r 生成 $dst/<name>/ 双层目录
+        mkdir -p "$dst" && cp -a "$src/." "$dst/" && echo "✓ $1 synced"
         SYNC_COUNT=1
     else
         echo "✗ $1 not found in dotfiles"
